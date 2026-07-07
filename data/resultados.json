@@ -1,0 +1,146 @@
+{
+    "evento": {
+        "nombre": "Gran Fondo Ciclista 2024",
+        "fecha": "15 de Diciembre 2024",
+        "lugar": "Ciudad de Mexico",
+        "distancia": "80 km",
+        "organizador": "Competencias de Ciclismo"
+    },
+    "resultados": [
+        {
+            "posicion": 1,
+            "dorsal": 101,
+            "nombre": "Carlos Martinez",
+            "categoria": "Elite Varonil",
+            "evento": "80 km",
+            "tiempo": "02:15:32",
+            "diferencia": "-"
+        },
+        {
+            "posicion": 2,
+            "dorsal": 115,
+            "nombre": "Miguel Rodriguez",
+            "categoria": "Elite Varonil",
+            "evento": "80 km",
+            "tiempo": "02:16:45",
+            "diferencia": "+01:13"
+        },
+        {
+            "posicion": 3,
+            "dorsal": 108,
+            "nombre": "Jose Lopez",
+            "categoria": "Elite Varonil",
+            "evento": "80 km",
+            "tiempo": "02:18:20",
+            "diferencia": "+02:48"
+        },
+        {
+            "posicion": 4,
+            "dorsal": 122,
+            "nombre": "Roberto Hernandez",
+            "categoria": "Elite Varonil",
+            "evento": "80 km",
+            "tiempo": "02:20:05",
+            "diferencia": "+04:33"
+        },
+        {
+            "posicion": 5,
+            "dorsal": 130,
+            "nombre": "Fernando Garcia",
+            "categoria": "Master 30",
+            "evento": "80 km",
+            "tiempo": "02:22:18",
+            "diferencia": "+06:46"
+        },
+        {
+            "posicion": 6,
+            "dorsal": 205,
+            "nombre": "Ana Ramirez",
+            "categoria": "Elite Femenil",
+            "evento": "80 km",
+            "tiempo": "02:25:40",
+            "diferencia": "+10:08"
+        },
+        {
+            "posicion": 7,
+            "dorsal": 142,
+            "nombre": "Pedro Sanchez",
+            "categoria": "Master 40",
+            "evento": "80 km",
+            "tiempo": "02:26:55",
+            "diferencia": "+11:23"
+        },
+        {
+            "posicion": 8,
+            "dorsal": 210,
+            "nombre": "Laura Torres",
+            "categoria": "Elite Femenil",
+            "evento": "80 km",
+            "tiempo": "02:28:12",
+            "diferencia": "+12:40"
+        },
+        {
+            "posicion": 9,
+            "dorsal": 155,
+            "nombre": "Ricardo Morales",
+            "categoria": "Master 30",
+            "evento": "80 km",
+            "tiempo": "02:30:05",
+            "diferencia": "+14:33"
+        },
+        {
+            "posicion": 10,
+            "dorsal": 301,
+            "nombre": "Diego Flores",
+            "categoria": "Juvenil",
+            "evento": "40 km",
+            "tiempo": "01:35:22",
+            "diferencia": "-"
+        },
+        {
+            "posicion": 11,
+            "dorsal": 310,
+            "nombre": "Sofia Mendez",
+            "categoria": "Juvenil",
+            "evento": "40 km",
+            "tiempo": "01:38:45",
+            "diferencia": "+03:23"
+        },
+        {
+            "posicion": 12,
+            "dorsal": 320,
+            "nombre": "Alejandro Diaz",
+            "categoria": "Juvenil",
+            "evento": "40 km",
+            "tiempo": "01:40:10",
+            "diferencia": "+04:48"
+        },
+        {
+            "posicion": 13,
+            "dorsal": 160,
+            "nombre": "Manuel Ortiz",
+            "categoria": "Master 40",
+            "evento": "80 km",
+            "tiempo": "02:32:40",
+            "diferencia": "+17:08"
+        },
+        {
+            "posicion": 14,
+            "dorsal": 215,
+            "nombre": "Maria Gonzalez",
+            "categoria": "Elite Femenil",
+            "evento": "80 km",
+            "tiempo": "02:34:18",
+            "diferencia": "+18:46"
+        },
+        {
+            "posicion": 15,
+            "dorsal": 170,
+            "nombre": "Jorge Vargas",
+            "categoria": "Master 50",
+            "evento": "80 km",
+            "tiempo": "02:38:50",
+            "diferencia": "+23:18"
+        }
+    ]
+}

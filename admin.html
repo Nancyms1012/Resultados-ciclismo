@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Resultados de Ciclismo</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <svg class="logo-icon" viewBox="0 0 64 64" width="48" height="48">
+                        <circle cx="16" cy="44" r="12" fill="none" stroke="currentColor" stroke-width="3"/>
+                        <circle cx="48" cy="44" r="12" fill="none" stroke="currentColor" stroke-width="3"/>
+                        <path d="M16 44 L28 20 L38 20 L48 44" fill="none" stroke="currentColor" stroke-width="3"/>
+                        <path d="M28 20 L32 44 L48 44" fill="none" stroke="currentColor" stroke-width="3"/>
+                        <circle cx="16" cy="44" r="3" fill="currentColor"/>
+                        <circle cx="48" cy="44" r="3" fill="currentColor"/>
+                    </svg>
+                    <div>
+                        <h1 class="site-title">Panel de Administracion</h1>
+                        <p class="site-subtitle">Gestionar Resultados</p>
+                    </div>
+                </div>
+                <nav class="nav">
+                    <a href="index.html" class="nav-link">Ver Resultados</a>
+                    <a href="admin.html" class="nav-link active">Admin</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="admin-section">
+        <div class="container">
+
+            <!-- Instructions -->
+            <div class="admin-card">
+                <h3>Como subir resultados</h3>
+                <p>Sigue estos pasos para actualizar los resultados de la competencia:</p>
+                <ol class="instructions-list">
+                    <li>Descarga la plantilla CSV haciendo clic en el boton de abajo</li>
+                    <li>Abre el archivo en Excel o Google Sheets y llena los datos de los corredores</li>
+                    <li>Guarda el archivo como CSV (separado por comas)</li>
+                    <li>Sube el archivo CSV en la seccion de abajo</li>
+                    <li>Revisa la vista previa y confirma los datos</li>
+                    <li>Copia el contenido JSON generado y actualizalo en el archivo <code>data/resultados.json</code> de tu repositorio</li>
+                </ol>
+                <div class="template-download">
+                    <button id="btn-download-template" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Descargar Plantilla CSV
+                    </button>
+                </div>
+            </div>
+
+            <!-- Event Configuration -->
+            <div class="admin-card">
+                <h3>Configuracion del Evento</h3>
+                <p>Informacion general que aparecera en la pagina principal:</p>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="event-name">Nombre del evento</label>
+                        <input type="text" id="event-name" placeholder="Ej: Gran Fondo Ciclista 2024">
+                    </div>
+                    <div class="form-group">
+                        <label for="event-date">Fecha</label>
+                        <input type="text" id="event-date" placeholder="Ej: 15 de Diciembre 2024">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="event-place">Lugar</label>
+                        <input type="text" id="event-place" placeholder="Ej: Ciudad de Mexico">
+                    </div>
+                    <div class="form-group">
+                        <label for="event-distance">Distancia / Modalidad</label>
+                        <input type="text" id="event-distance" placeholder="Ej: 80 km">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="event-organizer">Organizador</label>
+                    <input type="text" id="event-organizer" placeholder="Ej: Nombre de tu organizacion">
+                </div>
+            </div>
+
+            <!-- CSV Upload -->
+            <div class="admin-card">
+                <h3>Subir Resultados (CSV)</h3>
+                <p>Sube un archivo CSV con los resultados. El archivo debe tener las columnas: posicion, dorsal, nombre, categoria, evento, tiempo, diferencia</p>
+                
+                <div id="alert-success" class="alert alert-success">Datos cargados correctamente</div>
+                <div id="alert-error" class="alert alert-error">Error al cargar los datos</div>
+
+                <div class="upload-area" id="upload-area">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <p><strong>Haz clic aqui</strong> o arrastra tu archivo CSV</p>
+                    <p class="upload-hint">Formato: CSV (separado por comas)</p>
+                    <input type="file" id="csv-file" accept=".csv" style="display: none;">
+                </div>
+
+                <!-- Data Preview -->
+                <div id="data-preview" class="data-preview" style="display: none;">
+                </div>
+            </div>
+
+            <!-- Manual Entry -->
+            <div class="admin-card">
+                <h3>Agregar Corredor Individual</h3>
+                <p>Agrega un resultado individual (util para ir agregando conforme van llegando):</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="add-position">Posicion</label>
+                        <input type="number" id="add-position" placeholder="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="add-dorsal">Dorsal</label>
+                        <input type="number" id="add-dorsal" placeholder="101" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="add-time">Tiempo</label>
+                        <input type="text" id="add-time" placeholder="02:15:32">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="add-name">Nombre completo</label>
+                        <input type="text" id="add-name" placeholder="Carlos Martinez">
+                    </div>
+                    <div class="form-group">
+                        <label for="add-category">Categoria</label>
+                        <input type="text" id="add-category" placeholder="Elite Varonil">
+                    </div>
+                    <div class="form-group">
+                        <label for="add-event">Evento</label>
+                        <input type="text" id="add-event" placeholder="80 km">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="add-diff">Diferencia con el primero</label>
+                    <input type="text" id="add-diff" placeholder="+01:13 (dejar vacio si es el primero)">
+                </div>
+                <button id="btn-add-runner" class="btn btn-success">Agregar Corredor</button>
+            </div>
+
+            <!-- Generated JSON Output -->
+            <div class="admin-card">
+                <h3>Resultado Generado (JSON)</h3>
+                <p>Este es el contenido que debes copiar y pegar en el archivo <code>data/resultados.json</code> de tu repositorio en GitHub:</p>
+                <div class="form-group">
+                    <textarea id="json-output" rows="12" style="font-family: monospace; font-size: 0.8rem;" readonly></textarea>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button id="btn-copy-json" class="btn btn-primary">Copiar JSON</button>
+                    <button id="btn-download-json" class="btn btn-outline">Descargar archivo JSON</button>
+                    <button id="btn-clear-all" class="btn btn-danger">Limpiar Todo</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Panel de Administracion | Resultados de Ciclismo &copy; 2024</p>
+        </div>
+    </footer>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>
