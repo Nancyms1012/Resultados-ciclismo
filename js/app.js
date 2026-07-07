@@ -1,5 +1,6 @@
 // ===== CYCLING RESULTS APP =====
-// Lee el formato de la empresa de chips (categorias como secciones, separado por tabs)
+// Soporta multiples archivos CSV (uno por evento)
+// Lee el formato de empresa de chips (categorias como secciones, separado por tabs)
 
 (function() {
     'use strict';
@@ -9,7 +10,8 @@
     let filteredResults = [];
     let currentSort = { field: 'posicion', direction: 'asc' };
     let categories = [];
-    let events = [];
+    let equipos = [];
+    let eventos = [];
 
     // DOM Elements
     const searchInput = document.getElementById('search-text');
@@ -81,44 +83,107 @@
                 eventDetails.textContent = '';
             });
 
-        // Load results - try the chip timing format first
-        fetch('data/resultados.csv' + cacheBuster)
+        // Try to load eventos.csv (multi-event config)
+        fetch('data/eventos.csv' + cacheBuster)
             .then(response => {
-                if (!response.ok) throw new Error('No se encontro el archivo');
+                if (!response.ok) throw new Error('No multi-event config');
                 return response.text();
             })
             .then(text => {
-                allResults = parseChipTimingFile(text);
-
-                categories = [...new Set(allResults.map(r => r.categoria).filter(c => c))].sort();
-                events = [...new Set(allResults.map(r => r.evento).filter(e => e))].sort();
-
-                populateFilters();
-                applyFilters();
-                showLoading(false);
+                const eventFiles = parseEventsList(text);
+                if (eventFiles.length > 0) {
+                    return loadMultipleEvents(eventFiles);
+                } else {
+                    throw new Error('Empty events list');
+                }
             })
-            .catch(error => {
-                console.log('Info:', error.message);
-                showLoading(false);
-                allResults = [];
-                filteredResults = [];
-                eventTitle.textContent = 'Resultados de Ciclismo';
-                eventDetails.textContent = 'Sube el archivo resultados.csv a la carpeta data/';
-                renderResults();
+            .then(() => {
+                finishLoading();
+            })
+            .catch(() => {
+                // Fallback: try single file (resultados.csv)
+                fetch('data/resultados.csv' + cacheBuster)
+                    .then(response => {
+                        if (!response.ok) throw new Error('No file');
+                        return response.text();
+                    })
+                    .then(text => {
+                        allResults = parseChipTimingFile(text, '');
+                        finishLoading();
+                    })
+                    .catch(error => {
+                        console.log('Info:', error.message);
+                        showLoading(false);
+                        allResults = [];
+                        filteredResults = [];
+                        eventTitle.textContent = 'Resultados de Ciclismo';
+                        eventDetails.textContent = 'Sube tus archivos CSV a la carpeta data/';
+                        renderResults();
+                    });
             });
     }
 
-    // ===== PARSER PARA FORMATO DE EMPRESA DE CHIPS =====
-    // Formato:
-    //   NOMBRE DE CATEGORIA (linea sola, sin tabs/comas de datos)
-    //   Pos  Numero  Nombre Participante  Equipo  Tiempo
-    //   1    2009    Julian Ulloa Castro   INDEPENDIENTE  01:33:54.496
-    //   ...
-    //   (linea en blanco)
-    //   OTRA CATEGORIA
-    //   ...
+    // Parse eventos.csv (list of event files)
+    function parseEventsList(text) {
+        const lines = text.split(/\r?\n/).filter(line => line.trim());
+        const eventFiles = [];
 
-    function parseChipTimingFile(text) {
+        if (lines.length < 2) return [];
+
+        // First line is header
+        const separator = lines[0].includes('\t') ? '\t' : ',';
+
+        for (let i = 1; i < lines.length; i++) {
+            const parts = lines[i].split(separator).map(p => p.trim());
+            if (parts.length >= 2 && parts[0]) {
+                eventFiles.push({
+                    archivo: parts[0],
+                    evento: parts[1] || parts[0].replace(/\.csv$/i, '').replace(/resultados_?/i, '')
+                });
+            }
+        }
+
+        return eventFiles;
+    }
+
+    // Load multiple event files
+    function loadMultipleEvents(eventFiles) {
+        const cacheBuster = '?t=' + Date.now();
+        const promises = eventFiles.map(ef => {
+            return fetch('data/' + ef.archivo + cacheBuster)
+                .then(response => {
+                    if (!response.ok) throw new Error('No file: ' + ef.archivo);
+                    return response.text();
+                })
+                .then(text => {
+                    return parseChipTimingFile(text, ef.evento);
+                })
+                .catch(() => {
+                    console.log('No se pudo cargar: ' + ef.archivo);
+                    return [];
+                });
+        });
+
+        return Promise.all(promises).then(resultsArrays => {
+            allResults = [];
+            resultsArrays.forEach(results => {
+                allResults = allResults.concat(results);
+            });
+        });
+    }
+
+    function finishLoading() {
+        categories = [...new Set(allResults.map(r => r.categoria).filter(c => c))].sort();
+        equipos = [...new Set(allResults.map(r => r.equipo).filter(e => e))].sort();
+        eventos = [...new Set(allResults.map(r => r.evento).filter(e => e))].sort();
+
+        populateFilters();
+        applyFilters();
+        showLoading(false);
+    }
+
+    // ===== PARSER PARA FORMATO DE EMPRESA DE CHIPS =====
+    function parseChipTimingFile(text, eventoName) {
         const lines = text.split(/\r?\n/);
         const results = [];
         let currentCategory = '';
@@ -129,34 +194,29 @@
             const line = lines[i];
             const trimmed = line.trim();
 
-            // Skip empty lines
             if (!trimmed) {
                 headerFound = false;
                 continue;
             }
 
-            // Detect separator (tab or comma)
             const separator = detectSeparator(line);
             const parts = splitLine(line, separator);
 
             // Is this a category header?
-            // A category header is a line that:
-            // - Has only 1 column (no separators with data) OR
-            // - Does NOT start with a number in the first column AND is not a column header
             if (isCategoryHeader(trimmed, parts)) {
                 currentCategory = trimmed;
                 headerFound = false;
                 continue;
             }
 
-            // Is this a column header row? (Pos, Numero, Nombre...)
+            // Is this a column header row?
             if (isColumnHeader(parts)) {
                 colMap = mapColumns(parts);
                 headerFound = true;
                 continue;
             }
 
-            // Data row - only process if we have a category and header
+            // Data row
             if (headerFound && colMap && parts.length >= 3) {
                 const pos = getColValue(parts, colMap.pos);
                 const numero = getColValue(parts, colMap.numero);
@@ -164,14 +224,14 @@
                 const equipo = getColValue(parts, colMap.equipo);
                 const tiempo = getColValue(parts, colMap.tiempo);
 
-                // Validate it's a data row (position should be a number)
-                if (pos && !isNaN(parseInt(pos)) && nombre) {
+                if (pos && !isNaN(parseInt(pos)) && nombre.trim()) {
                     results.push({
                         posicion: parseInt(pos),
                         dorsal: parseInt(numero) || 0,
                         nombre: nombre.trim(),
                         categoria: currentCategory,
-                        evento: equipo ? equipo.trim() : '',
+                        equipo: equipo ? equipo.trim() : '',
+                        evento: eventoName,
                         tiempo: formatTime(tiempo),
                         diferencia: ''
                     });
@@ -185,21 +245,17 @@
         return results;
     }
 
-    // Detect if file uses tabs or commas
     function detectSeparator(line) {
         const tabs = (line.match(/\t/g) || []).length;
         const commas = (line.match(/,/g) || []).length;
         if (tabs >= 2) return '\t';
         if (commas >= 2) return ',';
-        // Check for multiple spaces (fixed-width format)
         if (/\s{2,}/.test(line)) return 'spaces';
         return '\t';
     }
 
-    // Split line by separator
     function splitLine(line, separator) {
         if (separator === 'spaces') {
-            // Split by 2+ spaces
             return line.trim().split(/\s{2,}/);
         }
         if (separator === ',') {
@@ -208,19 +264,15 @@
         return line.split(separator);
     }
 
-    // Check if a line is a category header
     function isCategoryHeader(trimmed, parts) {
-        // If the line has no tab/multi-space separators that produce 3+ columns, it's likely a header
         if (parts.length <= 2 && trimmed.length > 0 && isNaN(parseInt(parts[0]))) {
             return true;
         }
-        // Additional check: if first "column" contains multiple words and is not a number
         if (parts.length >= 3) return false;
         if (/^\d+$/.test(parts[0])) return false;
         return true;
     }
 
-    // Check if this is a column header row
     function isColumnHeader(parts) {
         if (parts.length < 3) return false;
         const first = parts[0].trim().toLowerCase();
@@ -228,7 +280,6 @@
         return headerKeywords.includes(first);
     }
 
-    // Map column indexes from header
     function mapColumns(parts) {
         const map = { pos: 0, numero: 1, nombre: 2, equipo: -1, tiempo: -1 };
         
@@ -239,7 +290,7 @@
                 map.pos = i;
             } else if (['numero', 'num', 'dorsal', 'bib', 'no', 'number'].includes(col)) {
                 map.numero = i;
-            } else if (['nombre', 'nombre participante', 'name', 'corredor', 'ciclista', 'rider', 'atleta', 'participante'].includes(col)) {
+            } else if (col.includes('nombre') || col.includes('name') || col.includes('participante') || col.includes('corredor') || col.includes('ciclista') || col.includes('rider') || col.includes('atleta')) {
                 map.nombre = i;
             } else if (['equipo', 'team', 'club', 'grupo'].includes(col)) {
                 map.equipo = i;
@@ -248,37 +299,18 @@
             }
         }
 
-        // If nombre not found by exact match, try partial match
-        if (map.nombre === 2) {
-            for (let i = 0; i < parts.length; i++) {
-                const col = parts[i].trim().toLowerCase();
-                if (col.includes('nombre') || col.includes('name') || col.includes('participante')) {
-                    map.nombre = i;
-                    break;
-                }
-            }
-        }
-
         return map;
     }
 
-    // Get column value safely
     function getColValue(parts, index) {
         if (index === -1 || index >= parts.length) return '';
         return parts[index] || '';
     }
 
-    // Format time (handle different formats)
     function formatTime(time) {
         if (!time) return '';
         time = time.trim();
-        
-        // Already in HH:MM:SS or HH:MM:SS.mmm format
-        if (/^\d{1,2}:\d{2}:\d{2}/.test(time)) {
-            return time;
-        }
-        
-        // Seconds only
+        if (/^\d{1,2}:\d{2}:\d{2}/.test(time)) return time;
         if (/^\d+\.?\d*$/.test(time)) {
             const totalSec = parseFloat(time);
             const h = Math.floor(totalSec / 3600);
@@ -286,7 +318,6 @@
             const s = (totalSec % 60).toFixed(3);
             return `${pad(h)}:${pad(m)}:${s.padStart(6, '0')}`;
         }
-
         return time;
     }
 
@@ -294,7 +325,6 @@
         return n.toString().padStart(2, '0');
     }
 
-    // Calculate time differences within each category
     function calculateDifferences(results) {
         const byCategory = {};
         
@@ -304,7 +334,6 @@
         });
 
         Object.values(byCategory).forEach(group => {
-            // Sort by position within category
             group.sort((a, b) => a.posicion - b.posicion);
             
             if (group.length > 0 && group[0].tiempo) {
@@ -335,7 +364,6 @@
         return `${pad(h)}:${pad(mins)}:${pad(s)}`;
     }
 
-    // Parse CSV line (handles quoted values)
     function parseCSVLine(line) {
         const result = [];
         let current = '';
@@ -356,7 +384,6 @@
         return result;
     }
 
-    // Parse event configuration
     function parseEventConfig(text) {
         const lines = text.split(/\r?\n/).filter(line => line.trim());
         const config = {};
@@ -384,7 +411,7 @@
     // ===== FILTERS =====
     function populateFilters() {
         categorySelect.innerHTML = '<option value="">Todas las categorias</option>';
-        eventSelect.innerHTML = '<option value="">Todos los equipos</option>';
+        eventSelect.innerHTML = '<option value="">Todos los eventos</option>';
 
         categories.forEach(cat => {
             const option = document.createElement('option');
@@ -393,18 +420,31 @@
             categorySelect.appendChild(option);
         });
 
-        events.forEach(evt => {
-            const option = document.createElement('option');
-            option.value = evt;
-            option.textContent = evt;
-            eventSelect.appendChild(option);
-        });
+        // If there are multiple events, show event filter
+        // If only one event, show equipo filter instead
+        if (eventos.length > 1) {
+            eventos.forEach(evt => {
+                const option = document.createElement('option');
+                option.value = evt;
+                option.textContent = evt;
+                eventSelect.appendChild(option);
+            });
+        } else {
+            eventSelect.innerHTML = '<option value="">Todos los equipos</option>';
+            equipos.forEach(eq => {
+                const option = document.createElement('option');
+                option.value = eq;
+                option.textContent = eq;
+                eventSelect.appendChild(option);
+            });
+        }
     }
 
     function applyFilters() {
         const searchTerm = searchInput.value.trim().toLowerCase();
         const selectedCategory = categorySelect.value;
         const selectedEvent = eventSelect.value;
+        const filterByEvent = eventos.length > 1;
 
         filteredResults = allResults.filter(result => {
             const matchesSearch = !searchTerm ||
@@ -412,7 +452,15 @@
                 result.nombre.toLowerCase().includes(searchTerm);
 
             const matchesCategory = !selectedCategory || result.categoria === selectedCategory;
-            const matchesEvent = !selectedEvent || result.evento === selectedEvent;
+
+            let matchesEvent = true;
+            if (selectedEvent) {
+                if (filterByEvent) {
+                    matchesEvent = result.evento === selectedEvent;
+                } else {
+                    matchesEvent = result.equipo === selectedEvent;
+                }
+            }
 
             return matchesSearch && matchesCategory && matchesEvent;
         });
@@ -455,13 +503,14 @@
     }
 
     function renderTable(results) {
+        const showEvento = eventos.length > 1;
         resultsBody.innerHTML = results.map(r => `
             <tr>
                 <td><span class="position-badge position-${r.posicion <= 3 ? r.posicion : ''}">${r.posicion}</span></td>
                 <td><span class="dorsal-badge">${r.dorsal}</span></td>
                 <td><strong>${r.nombre}</strong></td>
                 <td><span class="category-tag">${r.categoria}</span></td>
-                <td>${r.evento}</td>
+                <td>${showEvento ? r.evento : r.equipo}</td>
                 <td class="time-display">${r.tiempo || '--:--:--'}</td>
                 <td class="diff-display">${r.diferencia || '-'}</td>
             </tr>
@@ -469,12 +518,13 @@
     }
 
     function renderCards(results) {
+        const showEvento = eventos.length > 1;
         resultsCards.innerHTML = results.map(r => `
             <div class="result-card">
                 <div class="card-position">${r.posicion}</div>
                 <div class="card-info">
                     <h4><span class="dorsal-badge">${r.dorsal}</span> ${r.nombre}</h4>
-                    <div class="card-meta">${r.categoria} | ${r.evento}</div>
+                    <div class="card-meta">${r.categoria}${showEvento ? ' | ' + r.evento : (r.equipo ? ' | ' + r.equipo : '')}</div>
                 </div>
                 <div class="card-time">
                     <div class="time">${r.tiempo || '--:--:--'}</div>

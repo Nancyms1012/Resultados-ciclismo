@@ -1,11 +1,10 @@
 # Resultados de Ciclismo
 
 Pagina web para publicar resultados de competencias de ciclismo.
-Los participantes pueden buscar por dorsal, nombre, categoria o equipo.
+Soporta multiples eventos en la misma competencia.
+Los participantes pueden buscar por dorsal, nombre, categoria o evento.
 
 ## Ver la pagina en vivo
-
-Una vez activado GitHub Pages, tu pagina estara disponible en:
 
 **https://nancyms1012.github.io/Resultados-ciclismo/**
 
@@ -13,21 +12,55 @@ Una vez activado GitHub Pages, tu pagina estara disponible en:
 
 ## Como activar la pagina (solo la primera vez)
 
-1. Ve a tu repositorio en GitHub: https://github.com/Nancyms1012/Resultados-ciclismo
-2. Haz clic en **Settings** (Configuracion)
-3. En el menu izquierdo, busca **Pages**
-4. En "Source" selecciona **Deploy from a branch**
-5. En "Branch" selecciona **main** y la carpeta **/ (root)**
-6. Haz clic en **Save**
-7. Espera 1-2 minutos y tu pagina estara en linea
+1. Ve a tu repositorio: https://github.com/Nancyms1012/Resultados-ciclismo
+2. **Settings** > **Pages**
+3. Branch: **main** / carpeta: **/ (root)**
+4. **Save**
+5. En 1-2 minutos estara en linea
 
 ---
 
 ## Como subir resultados
 
-### El archivo que te manda la empresa de chips funciona directamente
+### Cuando tienes UN solo evento:
 
-La pagina lee el formato que exportan las empresas de cronometraje por chip:
+1. Guarda el archivo de la empresa de chips como **`resultados.csv`**
+2. Subelo a https://github.com/Nancyms1012/Resultados-ciclismo/upload/main/data
+3. ¡Listo!
+
+### Cuando tienes DOS o MAS eventos (como este domingo):
+
+Necesitas hacer dos cosas:
+
+#### 1. Sube un archivo CSV por cada evento
+
+Por ejemplo:
+- `resultados_mtb60k.csv` (archivo de chips del evento 1)
+- `resultados_ruta100k.csv` (archivo de chips del evento 2)
+
+Subelos a: https://github.com/Nancyms1012/Resultados-ciclismo/upload/main/data
+
+#### 2. Edita el archivo `eventos.csv` para decirle a la pagina cuales son
+
+Ve a https://github.com/Nancyms1012/Resultados-ciclismo/blob/main/data/eventos.csv y editalo asi:
+
+```
+archivo,evento
+resultados_mtb60k.csv,MTB 60K
+resultados_ruta100k.csv,Ruta 100K
+```
+
+Donde:
+- **archivo** = nombre exacto del archivo que subiste
+- **evento** = nombre que quieres que aparezca en la pagina
+
+¡Eso es todo! La pagina mostrara un filtro para elegir entre los eventos.
+
+---
+
+## Formato del archivo de chips
+
+La pagina lee directamente el formato que mandan las empresas de cronometraje:
 
 ```
 EXPERTOS MASCULINO
@@ -42,109 +75,69 @@ Pos	Numero	Nombre Participante	Equipo	Tiempo
 ...
 ```
 
-**No necesitas modificar nada.** Solo sube el archivo tal cual te lo mandan.
-
-### Pasos para subir:
-
-1. Guarda el archivo que te manda la empresa como **resultados.csv**
-2. Ve a https://github.com/Nancyms1012/Resultados-ciclismo/tree/main/data
-3. Haz clic en **Add file** > **Upload files**
-4. Arrastra tu archivo `resultados.csv`
-5. Haz clic en **Commit changes**
-6. En 1-2 minutos la pagina se actualiza automaticamente
-
-**Nota:** Si ya existe un archivo `resultados.csv`, GitHub te preguntara si quieres reemplazarlo. Di que si.
+**No necesitas modificar nada del archivo.** Solo guardalo como CSV y subelo.
 
 ---
 
 ## Como cambiar la informacion del evento
 
-El archivo `data/evento.csv` tiene la informacion del evento. Editalo directamente en GitHub:
-
-1. Ve a https://github.com/Nancyms1012/Resultados-ciclismo/blob/main/data/evento.csv
-2. Haz clic en el lapiz (editar)
-3. Cambia los datos:
+Edita `data/evento.csv` en GitHub:
 
 ```
-nombre,Gran Fondo Ciclista 2024
-fecha,15 de Diciembre 2024
-lugar,Ciudad de Mexico
-distancia,80 km
+nombre,Copa Ciclista 2024
+fecha,13 de Julio 2025
+lugar,San Jose Costa Rica
+distancia,MTB 60K y Ruta 100K
 organizador,Tu Organizacion
 ```
 
-4. Haz clic en **Commit changes**
+---
+
+## Comportamiento inteligente
+
+- **1 evento:** Muestra filtro por Equipo
+- **2+ eventos:** Muestra filtro por Evento (MTB 60K, Ruta 100K, etc.)
+- **Diferencias:** Se calculan automaticamente por categoria
+- **Categorias:** Se detectan automaticamente de los encabezados del archivo
 
 ---
 
-## Que reconoce la pagina automaticamente
+## Actualizar durante la competencia
 
-- **Categorias como secciones:** El nombre de la categoria aparece solo en una linea antes de los datos
-- **Separadores:** Acepta tabulaciones (tabs) o comas
-- **Encabezados flexibles:** Pos/Posicion, Numero/Dorsal, Nombre/Nombre Participante, Equipo/Team, Tiempo/Time
-- **Diferencias:** Se calculan automaticamente (diferencia con el primer lugar de cada categoria)
-
----
-
-## Actualizar resultados durante la competencia
-
-Para ir subiendo conforme van llegando los corredores:
-
-1. La empresa de chips te manda actualizaciones (o cortes)
-2. Guarda el archivo como `resultados.csv`
-3. Subelo a GitHub (reemplazando el anterior)
-4. Repite cada vez que tengas un nuevo corte
-
-**Tip:** Puedes hacer muchas actualizaciones al dia.
+1. La empresa de chips te manda un nuevo corte
+2. Guardalo con el mismo nombre de archivo
+3. Subelo a GitHub (reemplaza el anterior)
+4. Se actualiza en 1-2 minutos
 
 ---
 
-## Funciones de la pagina
-
-- **Busqueda** por dorsal o nombre del corredor
-- **Filtros** por categoria y equipo
-- **Ordenamiento** por columnas (clic en los encabezados)
-- **Responsive** - se ve bien en celular y computadora
-- **Diferencias** calculadas automaticamente
-- **Actualizacion** - boton para recargar sin refrescar toda la pagina
-
----
-
-## Estructura del proyecto
+## Estructura de archivos
 
 ```
-Resultados-ciclismo/
-├── index.html              ← Pagina principal (resultados)
-├── admin.html              ← Panel de ayuda
-├── css/
-│   └── styles.css          ← Estilos visuales
-├── js/
-│   ├── app.js              ← Lee el archivo de chips y muestra resultados
-│   └── admin.js            ← Logica del panel admin
-├── data/
-│   ├── resultados.csv      ← ** AQUI SUBES EL ARCHIVO DE LA EMPRESA **
-│   └── evento.csv          ← Informacion del evento
-└── README.md               ← Este archivo
+data/
+├── evento.csv                  ← Info general (nombre, fecha, lugar)
+├── eventos.csv                 ← Lista de archivos (solo si hay 2+ eventos)
+├── resultados_evento1.csv      ← Archivo de chips evento 1
+└── resultados_evento2.csv      ← Archivo de chips evento 2
 ```
+
+Si solo tienes 1 evento, no necesitas `eventos.csv`. Solo sube `resultados.csv`.
 
 ---
 
 ## Preguntas frecuentes
 
 **¿Tengo que modificar el archivo que me manda la empresa?**
-No. Solo guardalo como `resultados.csv` y subelo tal cual.
+No. Solo guardalo como CSV y subelo.
+
+**¿Puedo subir varios archivos a la vez?**
+Si, GitHub permite subir multiples archivos al mismo tiempo.
 
 **¿Cuanto tarda en actualizarse?**
-1-2 minutos despues de subir el archivo a GitHub.
-
-**¿Puedo tener varias competencias?**
-Si, simplemente reemplaza el CSV cada vez que tengas una nueva competencia.
+1-2 minutos.
 
 **¿Tiene costo?**
-No, GitHub Pages es completamente gratuito.
+No, GitHub Pages es gratuito.
 
 **¿Que pasa si me equivoco?**
-Simplemente sube uno nuevo y reemplazara el anterior.
-
-**¿Funciona con el formato de cualquier empresa de chips?**
-Esta configurado para el formato estandar (con categorias como encabezados de seccion). Si tu empresa usa otro formato, me avisas y lo adapto.
+Solo sube el archivo correcto de nuevo.
