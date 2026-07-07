@@ -1,16 +1,35 @@
-posicion,dorsal,nombre,categoria,evento,tiempo,diferencia
-1,101,Carlos Martinez,Elite Varonil,80 km,02:15:32,-
-2,115,Miguel Rodriguez,Elite Varonil,80 km,02:16:45,+01:13
-3,108,Jose Lopez,Elite Varonil,80 km,02:18:20,+02:48
-4,122,Roberto Hernandez,Elite Varonil,80 km,02:20:05,+04:33
-5,130,Fernando Garcia,Master 30,80 km,02:22:18,+06:46
-6,205,Ana Ramirez,Elite Femenil,80 km,02:25:40,+10:08
-7,142,Pedro Sanchez,Master 40,80 km,02:26:55,+11:23
-8,210,Laura Torres,Elite Femenil,80 km,02:28:12,+12:40
-9,155,Ricardo Morales,Master 30,80 km,02:30:05,+14:33
-10,301,Diego Flores,Juvenil,40 km,01:35:22,-
-11,310,Sofia Mendez,Juvenil,40 km,01:38:45,+03:23
-12,320,Alejandro Diaz,Juvenil,40 km,01:40:10,+04:48
-13,160,Manuel Ortiz,Master 40,80 km,02:32:40,+17:08
-14,215,Maria Gonzalez,Elite Femenil,80 km,02:34:18,+18:46
-15,170,Jorge Vargas,Master 50,80 km,02:38:50,+23:18
+EXPERTOS MASCULINO
+Pos	Numero	Nombre Participante	Equipo	Tiempo
+1	2009	Julian Ulloa Castro	INDEPENDIENTE	01:33:54.496
+2	2002	Jack Dany Rivera Castro	VEINTE24 CYCLING	01:43:27.548
+3	2006	Elias Josue Garcia Quesada	AD TRAINING	01:45:36.793
+4	2007	Josue Candia Cardenas	PASTAS ROMA	02:13:08.764
+5	2005	Jose Gabriel Bermudez Ramirez	PROFEREMO TRAINING CLUB	02:18:53.322
+6	2010	Jose Calderon Mora	PASTA ROMA	02:42:39.063
+
+EXPERTOS A MASCULINO
+Pos	Numero	Nombre Participante	Equipo	Tiempo
+1	2113	Yeikol Fallas Lara	VEINTE24	01:34:17.484
+2	2100	Oscar Esteban Arias Gomez	MANIAS-ACP CONSULTORES	01:41:12.554
+3	2106	Edgar Josue Zuniga Fernandez	INDEPENDIENTE	01:52:07.523
+4	2105	Geiner Rodrigo Rojas Gonzalez	MTB FEAR	01:53:53.729
+5	2112	Diego Portilla Quesada	TMS	01:55:32.196
+6	2108	Gabriel Jose Espinoza Barrios	ROMA	01:56:55.072
+7	2111	Alejandro Gonzalez Alvarez	IKIGAI TRAINNING	01:59:58.191
+8	2103	Luis Armando Ugalde Arguedas	VIBES TEAM	02:04:34.360
+9	2110	Lenin Arguedas Cordero	EPIC BIKE CENTER	02:07:16.215
+10	2107	Rigoberto Espinoza Ugalde	ROMA	02:35:39.940
+11	2102	Deiver Alonso Castro Carballo	KBCT IMPORTADORA SALAZAR	03:38:23.485
+
+EXPERTOS B MASCULINO
+Pos	Numero	Nombre Participante	Equipo	Tiempo
+1	2210	Cesar Andres Carballo Carballo		01:31:10.578
+2	2202	Luis Ortiz Alfaro	VEINTE24 CYCLING TEAM	01:35:40.899
+3	2220	Diego Jose Camacho Vargas	CAMAR TEAM	01:47:17.642
+4	2206	Carlos Andres Gabuardi Bautista	X3ME	01:50:10.449
+5	2225	Jose Alberto Navarro Barquero	PCT	01:54:20.739
+6	2217	Diego Andres Loaiza Calderon	CEVICHITO	01:57:20.353
+7	2222	Luis Arias Gonzalez	PASTAS ROMA	02:04:29.463
+8	2224	Luis Diego Castro Castro	VEINTE24 CYCLING	02:07:16.770
+9	2219	Alvaro Roberto Arguedas Bermudez	CAMAR TEAM	02:11:21.432
+10	2227	Bryan Vargas Jimenez	PASTAS ROMA	03:05:06.177

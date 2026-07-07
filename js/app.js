@@ -1,5 +1,5 @@
 // ===== CYCLING RESULTS APP =====
-// Lee directamente un archivo CSV - no necesitas saber JSON
+// Lee el formato de la empresa de chips (categorias como secciones, separado por tabs)
 
 (function() {
     'use strict';
@@ -40,12 +40,10 @@
         btnClear.addEventListener('click', clearFilters);
         btnRefresh.addEventListener('click', loadData);
 
-        // Search on Enter key
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') applyFilters();
         });
 
-        // Real-time search as you type
         searchInput.addEventListener('input', debounce(applyFilters, 300));
         categorySelect.addEventListener('change', applyFilters);
         eventSelect.addEventListener('change', applyFilters);
@@ -66,38 +64,32 @@
         });
     }
 
-    // ===== LOAD DATA FROM CSV FILE =====
+    // ===== LOAD DATA =====
     function loadData() {
         showLoading(true);
-
-        // Load event config first, then CSV results
         const cacheBuster = '?t=' + Date.now();
 
-        // Try to load event info from config file
+        // Load event info
         fetch('data/evento.csv' + cacheBuster)
             .then(response => {
                 if (!response.ok) throw new Error('No event config');
                 return response.text();
             })
-            .then(text => {
-                parseEventConfig(text);
-            })
+            .then(text => parseEventConfig(text))
             .catch(() => {
-                // No event config, use defaults
                 eventTitle.textContent = 'Resultados de Ciclismo';
                 eventDetails.textContent = '';
             });
 
-        // Load results from CSV
+        // Load results - try the chip timing format first
         fetch('data/resultados.csv' + cacheBuster)
             .then(response => {
-                if (!response.ok) throw new Error('No se encontro el archivo CSV');
+                if (!response.ok) throw new Error('No se encontro el archivo');
                 return response.text();
             })
             .then(text => {
-                allResults = parseCSV(text);
+                allResults = parseChipTimingFile(text);
 
-                // Extract unique categories and events
                 categories = [...new Set(allResults.map(r => r.categoria).filter(c => c))].sort();
                 events = [...new Set(allResults.map(r => r.evento).filter(e => e))].sort();
 
@@ -116,71 +108,234 @@
             });
     }
 
-    // ===== CSV PARSER =====
-    function parseCSV(text) {
-        const lines = text.split(/\r?\n/).filter(line => line.trim());
+    // ===== PARSER PARA FORMATO DE EMPRESA DE CHIPS =====
+    // Formato:
+    //   NOMBRE DE CATEGORIA (linea sola, sin tabs/comas de datos)
+    //   Pos  Numero  Nombre Participante  Equipo  Tiempo
+    //   1    2009    Julian Ulloa Castro   INDEPENDIENTE  01:33:54.496
+    //   ...
+    //   (linea en blanco)
+    //   OTRA CATEGORIA
+    //   ...
 
-        if (lines.length < 2) return [];
-
-        // Parse header row
-        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-
-        // Map common column names (flexible - accepts different names)
-        const colMap = {
-            posicion: findColumn(headers, ['posicion', 'pos', 'lugar', 'position', 'place', '#']),
-            dorsal: findColumn(headers, ['dorsal', 'numero', 'num', 'bib', 'number', 'no']),
-            nombre: findColumn(headers, ['nombre', 'name', 'corredor', 'ciclista', 'rider', 'atleta']),
-            categoria: findColumn(headers, ['categoria', 'cat', 'category', 'grupo', 'group']),
-            evento: findColumn(headers, ['evento', 'event', 'distancia', 'distance', 'modalidad', 'ruta']),
-            tiempo: findColumn(headers, ['tiempo', 'time', 'hora', 'crono', 'finish']),
-            diferencia: findColumn(headers, ['diferencia', 'dif', 'diff', 'gap', 'delta'])
-        };
-
-        // Parse data rows
+    function parseChipTimingFile(text) {
+        const lines = text.split(/\r?\n/);
         const results = [];
-        for (let i = 1; i < lines.length; i++) {
-            const values = parseCSVLine(lines[i]);
-            if (values.length === 0) continue;
+        let currentCategory = '';
+        let headerFound = false;
+        let colMap = null;
 
-            const row = {
-                posicion: getVal(values, colMap.posicion, i),
-                dorsal: getVal(values, colMap.dorsal, ''),
-                nombre: getVal(values, colMap.nombre, ''),
-                categoria: getVal(values, colMap.categoria, ''),
-                evento: getVal(values, colMap.evento, ''),
-                tiempo: getVal(values, colMap.tiempo, ''),
-                diferencia: getVal(values, colMap.diferencia, '-')
-            };
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const trimmed = line.trim();
 
-            // Convert numeric fields
-            row.posicion = parseInt(row.posicion) || i;
-            row.dorsal = parseInt(row.dorsal) || 0;
+            // Skip empty lines
+            if (!trimmed) {
+                headerFound = false;
+                continue;
+            }
 
-            // Skip rows without a name
-            if (row.nombre.trim()) {
-                results.push(row);
+            // Detect separator (tab or comma)
+            const separator = detectSeparator(line);
+            const parts = splitLine(line, separator);
+
+            // Is this a category header?
+            // A category header is a line that:
+            // - Has only 1 column (no separators with data) OR
+            // - Does NOT start with a number in the first column AND is not a column header
+            if (isCategoryHeader(trimmed, parts)) {
+                currentCategory = trimmed;
+                headerFound = false;
+                continue;
+            }
+
+            // Is this a column header row? (Pos, Numero, Nombre...)
+            if (isColumnHeader(parts)) {
+                colMap = mapColumns(parts);
+                headerFound = true;
+                continue;
+            }
+
+            // Data row - only process if we have a category and header
+            if (headerFound && colMap && parts.length >= 3) {
+                const pos = getColValue(parts, colMap.pos);
+                const numero = getColValue(parts, colMap.numero);
+                const nombre = getColValue(parts, colMap.nombre);
+                const equipo = getColValue(parts, colMap.equipo);
+                const tiempo = getColValue(parts, colMap.tiempo);
+
+                // Validate it's a data row (position should be a number)
+                if (pos && !isNaN(parseInt(pos)) && nombre) {
+                    results.push({
+                        posicion: parseInt(pos),
+                        dorsal: parseInt(numero) || 0,
+                        nombre: nombre.trim(),
+                        categoria: currentCategory,
+                        evento: equipo ? equipo.trim() : '',
+                        tiempo: formatTime(tiempo),
+                        diferencia: ''
+                    });
+                }
             }
         }
+
+        // Calculate differences per category
+        calculateDifferences(results);
 
         return results;
     }
 
-    // Find a column index by trying multiple possible header names
-    function findColumn(headers, possibleNames) {
-        for (const name of possibleNames) {
-            const idx = headers.indexOf(name);
-            if (idx !== -1) return idx;
+    // Detect if file uses tabs or commas
+    function detectSeparator(line) {
+        const tabs = (line.match(/\t/g) || []).length;
+        const commas = (line.match(/,/g) || []).length;
+        if (tabs >= 2) return '\t';
+        if (commas >= 2) return ',';
+        // Check for multiple spaces (fixed-width format)
+        if (/\s{2,}/.test(line)) return 'spaces';
+        return '\t';
+    }
+
+    // Split line by separator
+    function splitLine(line, separator) {
+        if (separator === 'spaces') {
+            // Split by 2+ spaces
+            return line.trim().split(/\s{2,}/);
         }
-        return -1;
+        if (separator === ',') {
+            return parseCSVLine(line);
+        }
+        return line.split(separator);
     }
 
-    // Get value from array by index, with default
-    function getVal(values, index, defaultVal) {
-        if (index === -1 || index >= values.length) return defaultVal;
-        return values[index].trim() || defaultVal;
+    // Check if a line is a category header
+    function isCategoryHeader(trimmed, parts) {
+        // If the line has no tab/multi-space separators that produce 3+ columns, it's likely a header
+        if (parts.length <= 2 && trimmed.length > 0 && isNaN(parseInt(parts[0]))) {
+            return true;
+        }
+        // Additional check: if first "column" contains multiple words and is not a number
+        if (parts.length >= 3) return false;
+        if (/^\d+$/.test(parts[0])) return false;
+        return true;
     }
 
-    // Parse a single CSV line (handles quoted values with commas inside)
+    // Check if this is a column header row
+    function isColumnHeader(parts) {
+        if (parts.length < 3) return false;
+        const first = parts[0].trim().toLowerCase();
+        const headerKeywords = ['pos', 'posicion', 'position', '#', 'lugar', 'place'];
+        return headerKeywords.includes(first);
+    }
+
+    // Map column indexes from header
+    function mapColumns(parts) {
+        const map = { pos: 0, numero: 1, nombre: 2, equipo: -1, tiempo: -1 };
+        
+        for (let i = 0; i < parts.length; i++) {
+            const col = parts[i].trim().toLowerCase();
+            
+            if (['pos', 'posicion', 'position', '#', 'lugar'].includes(col)) {
+                map.pos = i;
+            } else if (['numero', 'num', 'dorsal', 'bib', 'no', 'number'].includes(col)) {
+                map.numero = i;
+            } else if (['nombre', 'nombre participante', 'name', 'corredor', 'ciclista', 'rider', 'atleta', 'participante'].includes(col)) {
+                map.nombre = i;
+            } else if (['equipo', 'team', 'club', 'grupo'].includes(col)) {
+                map.equipo = i;
+            } else if (['tiempo', 'time', 'hora', 'crono', 'finish', 'chip'].includes(col)) {
+                map.tiempo = i;
+            }
+        }
+
+        // If nombre not found by exact match, try partial match
+        if (map.nombre === 2) {
+            for (let i = 0; i < parts.length; i++) {
+                const col = parts[i].trim().toLowerCase();
+                if (col.includes('nombre') || col.includes('name') || col.includes('participante')) {
+                    map.nombre = i;
+                    break;
+                }
+            }
+        }
+
+        return map;
+    }
+
+    // Get column value safely
+    function getColValue(parts, index) {
+        if (index === -1 || index >= parts.length) return '';
+        return parts[index] || '';
+    }
+
+    // Format time (handle different formats)
+    function formatTime(time) {
+        if (!time) return '';
+        time = time.trim();
+        
+        // Already in HH:MM:SS or HH:MM:SS.mmm format
+        if (/^\d{1,2}:\d{2}:\d{2}/.test(time)) {
+            return time;
+        }
+        
+        // Seconds only
+        if (/^\d+\.?\d*$/.test(time)) {
+            const totalSec = parseFloat(time);
+            const h = Math.floor(totalSec / 3600);
+            const m = Math.floor((totalSec % 3600) / 60);
+            const s = (totalSec % 60).toFixed(3);
+            return `${pad(h)}:${pad(m)}:${s.padStart(6, '0')}`;
+        }
+
+        return time;
+    }
+
+    function pad(n) {
+        return n.toString().padStart(2, '0');
+    }
+
+    // Calculate time differences within each category
+    function calculateDifferences(results) {
+        const byCategory = {};
+        
+        results.forEach(r => {
+            if (!byCategory[r.categoria]) byCategory[r.categoria] = [];
+            byCategory[r.categoria].push(r);
+        });
+
+        Object.values(byCategory).forEach(group => {
+            // Sort by position within category
+            group.sort((a, b) => a.posicion - b.posicion);
+            
+            if (group.length > 0 && group[0].tiempo) {
+                const firstTime = timeToSeconds(group[0].tiempo);
+                group[0].diferencia = '-';
+                
+                for (let i = 1; i < group.length; i++) {
+                    if (group[i].tiempo) {
+                        const diff = timeToSeconds(group[i].tiempo) - firstTime;
+                        group[i].diferencia = '+' + secondsToTime(diff);
+                    }
+                }
+            }
+        });
+    }
+
+    function secondsToTime(totalSec) {
+        if (totalSec < 60) {
+            return totalSec.toFixed(1) + 's';
+        }
+        const m = Math.floor(totalSec / 60);
+        const s = Math.floor(totalSec % 60);
+        if (m < 60) {
+            return `${pad(m)}:${pad(s)}`;
+        }
+        const h = Math.floor(m / 60);
+        const mins = m % 60;
+        return `${pad(h)}:${pad(mins)}:${pad(s)}`;
+    }
+
+    // Parse CSV line (handles quoted values)
     function parseCSVLine(line) {
         const result = [];
         let current = '';
@@ -201,16 +356,17 @@
         return result;
     }
 
-    // Parse event configuration from CSV
+    // Parse event configuration
     function parseEventConfig(text) {
         const lines = text.split(/\r?\n/).filter(line => line.trim());
         const config = {};
 
         for (const line of lines) {
-            const parts = line.split(',');
+            const separator = line.includes('\t') ? '\t' : ',';
+            const parts = line.split(separator);
             if (parts.length >= 2) {
                 const key = parts[0].trim().toLowerCase();
-                const value = parts.slice(1).join(',').trim();
+                const value = parts.slice(1).join(separator).trim();
                 config[key] = value;
             }
         }
@@ -228,7 +384,7 @@
     // ===== FILTERS =====
     function populateFilters() {
         categorySelect.innerHTML = '<option value="">Todas las categorias</option>';
-        eventSelect.innerHTML = '<option value="">Todos los eventos</option>';
+        eventSelect.innerHTML = '<option value="">Todos los equipos</option>';
 
         categories.forEach(cat => {
             const option = document.createElement('option');

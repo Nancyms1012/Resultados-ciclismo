@@ -1,7 +1,7 @@
 # Resultados de Ciclismo
 
 Pagina web para publicar resultados de competencias de ciclismo.
-Los participantes pueden buscar por dorsal, nombre, categoria o evento.
+Los participantes pueden buscar por dorsal, nombre, categoria o equipo.
 
 ## Ver la pagina en vivo
 
@@ -23,32 +23,35 @@ Una vez activado GitHub Pages, tu pagina estara disponible en:
 
 ---
 
-## Como subir resultados (SOLO CSV - super facil)
+## Como subir resultados
 
-### Paso 1: Crea tu archivo CSV en Excel o Google Sheets
+### El archivo que te manda la empresa de chips funciona directamente
 
-Crea una hoja con estas columnas:
+La pagina lee el formato que exportan las empresas de cronometraje por chip:
 
-| posicion | dorsal | nombre | categoria | evento | tiempo | diferencia |
-|----------|--------|--------|-----------|--------|--------|------------|
-| 1 | 101 | Carlos Martinez | Elite Varonil | 80 km | 02:15:32 | - |
-| 2 | 115 | Miguel Rodriguez | Elite Varonil | 80 km | 02:16:45 | +01:13 |
-| 3 | 205 | Ana Ramirez | Elite Femenil | 80 km | 02:25:40 | +10:08 |
+```
+EXPERTOS MASCULINO
+Pos	Numero	Nombre Participante	Equipo	Tiempo
+1	2009	Julian Ulloa Castro	INDEPENDIENTE	01:33:54.496
+2	2002	Jack Dany Rivera Castro	VEINTE24 CYCLING	01:43:27.548
+...
 
-**Importante:** La primera fila DEBE ser los encabezados (posicion, dorsal, nombre, etc.)
+EXPERTOS A MASCULINO
+Pos	Numero	Nombre Participante	Equipo	Tiempo
+1	2113	Yeikol Fallas Lara	VEINTE24	01:34:17.484
+...
+```
 
-### Paso 2: Guarda como CSV
+**No necesitas modificar nada.** Solo sube el archivo tal cual te lo mandan.
 
-- En **Excel**: Archivo > Guardar como > selecciona "CSV (delimitado por comas)"
-- En **Google Sheets**: Archivo > Descargar > Valores separados por coma (.csv)
+### Pasos para subir:
 
-### Paso 3: Sube el CSV a GitHub
-
-1. Ve a https://github.com/Nancyms1012/Resultados-ciclismo/tree/main/data
-2. Haz clic en **Add file** > **Upload files**
-3. Arrastra tu archivo `resultados.csv`
-4. Haz clic en **Commit changes**
-5. ¡Listo! En 1-2 minutos se actualizan los resultados
+1. Guarda el archivo que te manda la empresa como **resultados.csv**
+2. Ve a https://github.com/Nancyms1012/Resultados-ciclismo/tree/main/data
+3. Haz clic en **Add file** > **Upload files**
+4. Arrastra tu archivo `resultados.csv`
+5. Haz clic en **Commit changes**
+6. En 1-2 minutos la pagina se actualiza automaticamente
 
 **Nota:** Si ya existe un archivo `resultados.csv`, GitHub te preguntara si quieres reemplazarlo. Di que si.
 
@@ -74,44 +77,36 @@ organizador,Tu Organizacion
 
 ---
 
-## Nombres de columnas aceptados
+## Que reconoce la pagina automaticamente
 
-El sistema es flexible y acepta diferentes nombres de columnas:
-
-| Columna | Nombres aceptados |
-|---------|-------------------|
-| Posicion | posicion, pos, lugar, position, place, # |
-| Dorsal | dorsal, numero, num, bib, number, no |
-| Nombre | nombre, name, corredor, ciclista, rider, atleta |
-| Categoria | categoria, cat, category, grupo, group |
-| Evento | evento, event, distancia, distance, modalidad, ruta |
-| Tiempo | tiempo, time, hora, crono, finish |
-| Diferencia | diferencia, dif, diff, gap, delta |
-
-Esto significa que si tu cronometro exporta un CSV con columnas en ingles, tambien funcionara.
+- **Categorias como secciones:** El nombre de la categoria aparece solo en una linea antes de los datos
+- **Separadores:** Acepta tabulaciones (tabs) o comas
+- **Encabezados flexibles:** Pos/Posicion, Numero/Dorsal, Nombre/Nombre Participante, Equipo/Team, Tiempo/Time
+- **Diferencias:** Se calculan automaticamente (diferencia con el primer lugar de cada categoria)
 
 ---
 
 ## Actualizar resultados durante la competencia
 
-Para ir subiendo resultados conforme van llegando los corredores:
+Para ir subiendo conforme van llegando los corredores:
 
-1. Llena tu Excel/Sheets con los corredores que ya llegaron
-2. Guarda como CSV
-3. Sube a GitHub (reemplazando el anterior)
-4. Repite cada vez que quieras actualizar
+1. La empresa de chips te manda actualizaciones (o cortes)
+2. Guarda el archivo como `resultados.csv`
+3. Subelo a GitHub (reemplazando el anterior)
+4. Repite cada vez que tengas un nuevo corte
 
-**Tip:** Puedes hacer muchas actualizaciones al dia. Cada vez que subas un nuevo CSV, la pagina se actualiza en 1-2 minutos.
+**Tip:** Puedes hacer muchas actualizaciones al dia.
 
 ---
 
 ## Funciones de la pagina
 
 - **Busqueda** por dorsal o nombre del corredor
-- **Filtros** por categoria y evento
+- **Filtros** por categoria y equipo
 - **Ordenamiento** por columnas (clic en los encabezados)
 - **Responsive** - se ve bien en celular y computadora
-- **Actualizacion** - boton para recargar resultados sin refrescar toda la pagina
+- **Diferencias** calculadas automaticamente
+- **Actualizacion** - boton para recargar sin refrescar toda la pagina
 
 ---
 
@@ -124,10 +119,10 @@ Resultados-ciclismo/
 ├── css/
 │   └── styles.css          ← Estilos visuales
 ├── js/
-│   ├── app.js              ← Lee el CSV y muestra resultados
+│   ├── app.js              ← Lee el archivo de chips y muestra resultados
 │   └── admin.js            ← Logica del panel admin
 ├── data/
-│   ├── resultados.csv      ← ** AQUI SUBES TUS RESULTADOS **
+│   ├── resultados.csv      ← ** AQUI SUBES EL ARCHIVO DE LA EMPRESA **
 │   └── evento.csv          ← Informacion del evento
 └── README.md               ← Este archivo
 ```
@@ -136,8 +131,8 @@ Resultados-ciclismo/
 
 ## Preguntas frecuentes
 
-**¿Puedo usar Excel directamente?**
-No directamente, pero puedes guardar tu Excel como CSV (Guardar como > CSV) y subir ese archivo.
+**¿Tengo que modificar el archivo que me manda la empresa?**
+No. Solo guardalo como `resultados.csv` y subelo tal cual.
 
 **¿Cuanto tarda en actualizarse?**
 1-2 minutos despues de subir el archivo a GitHub.
@@ -148,5 +143,8 @@ Si, simplemente reemplaza el CSV cada vez que tengas una nueva competencia.
 **¿Tiene costo?**
 No, GitHub Pages es completamente gratuito.
 
-**¿Que pasa si me equivoco en el CSV?**
+**¿Que pasa si me equivoco?**
 Simplemente sube uno nuevo y reemplazara el anterior.
+
+**¿Funciona con el formato de cualquier empresa de chips?**
+Esta configurado para el formato estandar (con categorias como encabezados de seccion). Si tu empresa usa otro formato, me avisas y lo adapto.
