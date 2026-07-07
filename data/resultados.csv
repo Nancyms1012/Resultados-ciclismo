@@ -1,0 +1,16 @@
+posicion,dorsal,nombre,categoria,evento,tiempo,diferencia
+1,101,Carlos Martinez,Elite Varonil,80 km,02:15:32,-
+2,115,Miguel Rodriguez,Elite Varonil,80 km,02:16:45,+01:13
+3,108,Jose Lopez,Elite Varonil,80 km,02:18:20,+02:48
+4,122,Roberto Hernandez,Elite Varonil,80 km,02:20:05,+04:33
+5,130,Fernando Garcia,Master 30,80 km,02:22:18,+06:46
+6,205,Ana Ramirez,Elite Femenil,80 km,02:25:40,+10:08
+7,142,Pedro Sanchez,Master 40,80 km,02:26:55,+11:23
+8,210,Laura Torres,Elite Femenil,80 km,02:28:12,+12:40
+9,155,Ricardo Morales,Master 30,80 km,02:30:05,+14:33
+10,301,Diego Flores,Juvenil,40 km,01:35:22,-
+11,310,Sofia Mendez,Juvenil,40 km,01:38:45,+03:23
+12,320,Alejandro Diaz,Juvenil,40 km,01:40:10,+04:48
+13,160,Manuel Ortiz,Master 40,80 km,02:32:40,+17:08
+14,215,Maria Gonzalez,Elite Femenil,80 km,02:34:18,+18:46
+15,170,Jorge Vargas,Master 50,80 km,02:38:50,+23:18

@@ -1,8 +1,9 @@
-# 🚴 Resultados de Ciclismo
+# Resultados de Ciclismo
 
-Pagina web para publicar resultados de competencias de ciclismo en tiempo real. Los participantes pueden buscar por dorsal, nombre, categoria o evento.
+Pagina web para publicar resultados de competencias de ciclismo.
+Los participantes pueden buscar por dorsal, nombre, categoria o evento.
 
-## 🌐 Ver la pagina en vivo
+## Ver la pagina en vivo
 
 Una vez activado GitHub Pages, tu pagina estara disponible en:
 
@@ -10,7 +11,7 @@ Una vez activado GitHub Pages, tu pagina estara disponible en:
 
 ---
 
-## 🚀 Como activar la pagina (solo la primera vez)
+## Como activar la pagina (solo la primera vez)
 
 1. Ve a tu repositorio en GitHub: https://github.com/Nancyms1012/Resultados-ciclismo
 2. Haz clic en **Settings** (Configuracion)
@@ -22,160 +23,130 @@ Una vez activado GitHub Pages, tu pagina estara disponible en:
 
 ---
 
-## 📋 Como subir resultados de una competencia
+## Como subir resultados (SOLO CSV - super facil)
 
-### Opcion 1: Usando el Panel de Administracion (Recomendado)
+### Paso 1: Crea tu archivo CSV en Excel o Google Sheets
 
-1. Abre tu pagina web y ve a la seccion **Admin**
-2. Llena la informacion del evento (nombre, fecha, lugar)
-3. Puedes:
-   - **Subir un archivo CSV** con todos los resultados
-   - **Agregar corredores uno por uno** conforme van llegando
-4. Una vez que tengas todos los datos, haz clic en **Copiar JSON**
-5. Ve a GitHub > tu repositorio > carpeta `data` > archivo `resultados.json`
-6. Haz clic en el icono de lapiz (editar)
-7. Borra todo el contenido y pega lo que copiaste
-8. Haz clic en **Commit changes** (abajo de la pagina)
-9. Los resultados se actualizaran en 1-2 minutos
+Crea una hoja con estas columnas:
 
-### Opcion 2: Editar directamente en GitHub
+| posicion | dorsal | nombre | categoria | evento | tiempo | diferencia |
+|----------|--------|--------|-----------|--------|--------|------------|
+| 1 | 101 | Carlos Martinez | Elite Varonil | 80 km | 02:15:32 | - |
+| 2 | 115 | Miguel Rodriguez | Elite Varonil | 80 km | 02:16:45 | +01:13 |
+| 3 | 205 | Ana Ramirez | Elite Femenil | 80 km | 02:25:40 | +10:08 |
 
-1. Ve a https://github.com/Nancyms1012/Resultados-ciclismo/blob/main/data/resultados.json
-2. Haz clic en el icono de lapiz para editar
-3. Modifica los datos siguiendo el formato JSON
+**Importante:** La primera fila DEBE ser los encabezados (posicion, dorsal, nombre, etc.)
+
+### Paso 2: Guarda como CSV
+
+- En **Excel**: Archivo > Guardar como > selecciona "CSV (delimitado por comas)"
+- En **Google Sheets**: Archivo > Descargar > Valores separados por coma (.csv)
+
+### Paso 3: Sube el CSV a GitHub
+
+1. Ve a https://github.com/Nancyms1012/Resultados-ciclismo/tree/main/data
+2. Haz clic en **Add file** > **Upload files**
+3. Arrastra tu archivo `resultados.csv`
+4. Haz clic en **Commit changes**
+5. ¡Listo! En 1-2 minutos se actualizan los resultados
+
+**Nota:** Si ya existe un archivo `resultados.csv`, GitHub te preguntara si quieres reemplazarlo. Di que si.
+
+---
+
+## Como cambiar la informacion del evento
+
+El archivo `data/evento.csv` tiene la informacion del evento. Editalo directamente en GitHub:
+
+1. Ve a https://github.com/Nancyms1012/Resultados-ciclismo/blob/main/data/evento.csv
+2. Haz clic en el lapiz (editar)
+3. Cambia los datos:
+
+```
+nombre,Gran Fondo Ciclista 2024
+fecha,15 de Diciembre 2024
+lugar,Ciudad de Mexico
+distancia,80 km
+organizador,Tu Organizacion
+```
+
 4. Haz clic en **Commit changes**
 
-### Opcion 3: Usar el archivo CSV
+---
 
-1. Descarga la plantilla desde el panel Admin
-2. Llena los datos en Excel o Google Sheets
-3. Guarda como CSV
-4. Sube el CSV en el panel Admin
-5. Copia el JSON generado y actualizalo en GitHub
+## Nombres de columnas aceptados
+
+El sistema es flexible y acepta diferentes nombres de columnas:
+
+| Columna | Nombres aceptados |
+|---------|-------------------|
+| Posicion | posicion, pos, lugar, position, place, # |
+| Dorsal | dorsal, numero, num, bib, number, no |
+| Nombre | nombre, name, corredor, ciclista, rider, atleta |
+| Categoria | categoria, cat, category, grupo, group |
+| Evento | evento, event, distancia, distance, modalidad, ruta |
+| Tiempo | tiempo, time, hora, crono, finish |
+| Diferencia | diferencia, dif, diff, gap, delta |
+
+Esto significa que si tu cronometro exporta un CSV con columnas en ingles, tambien funcionara.
 
 ---
 
-## 📄 Formato del archivo de resultados
+## Actualizar resultados durante la competencia
 
-El archivo `data/resultados.json` tiene esta estructura:
+Para ir subiendo resultados conforme van llegando los corredores:
 
-```json
-{
-    "evento": {
-        "nombre": "Nombre de tu competencia",
-        "fecha": "15 de Diciembre 2024",
-        "lugar": "Ciudad",
-        "distancia": "80 km",
-        "organizador": "Tu organizacion"
-    },
-    "resultados": [
-        {
-            "posicion": 1,
-            "dorsal": 101,
-            "nombre": "Carlos Martinez",
-            "categoria": "Elite Varonil",
-            "evento": "80 km",
-            "tiempo": "02:15:32",
-            "diferencia": "-"
-        },
-        {
-            "posicion": 2,
-            "dorsal": 115,
-            "nombre": "Miguel Rodriguez",
-            "categoria": "Elite Varonil",
-            "evento": "80 km",
-            "tiempo": "02:16:45",
-            "diferencia": "+01:13"
-        }
-    ]
-}
-```
+1. Llena tu Excel/Sheets con los corredores que ya llegaron
+2. Guarda como CSV
+3. Sube a GitHub (reemplazando el anterior)
+4. Repite cada vez que quieras actualizar
 
-### Campos de cada corredor:
-
-| Campo | Descripcion | Ejemplo |
-|-------|-------------|---------|
-| posicion | Lugar en el que llego | 1, 2, 3... |
-| dorsal | Numero de dorsal | 101 |
-| nombre | Nombre completo | Carlos Martinez |
-| categoria | Categoria de competencia | Elite Varonil, Master 30, Juvenil |
-| evento | Distancia o modalidad | 80 km, 40 km |
-| tiempo | Tiempo oficial | 02:15:32 |
-| diferencia | Diferencia con el 1er lugar | +01:13 (usar "-" para el primero) |
+**Tip:** Puedes hacer muchas actualizaciones al dia. Cada vez que subas un nuevo CSV, la pagina se actualiza en 1-2 minutos.
 
 ---
 
-## 📄 Formato del archivo CSV
-
-Si prefieres usar CSV, el formato es:
-
-```
-posicion,dorsal,nombre,categoria,evento,tiempo,diferencia
-1,101,Carlos Martinez,Elite Varonil,80 km,02:15:32,-
-2,115,Miguel Rodriguez,Elite Varonil,80 km,02:16:45,+01:13
-3,205,Ana Ramirez,Elite Femenil,80 km,02:25:40,+10:08
-```
-
----
-
-## 🔄 Actualizar resultados durante la competencia
-
-Para ir actualizando conforme van llegando los corredores:
-
-1. Abre el panel Admin en tu celular o computadora
-2. Agrega cada corredor con el formulario individual
-3. Cuando tengas un grupo listo, copia el JSON
-4. Actualiza el archivo en GitHub
-5. Los cambios se reflejan en 1-2 minutos
-
-**Tip:** Puedes hacer multiples actualizaciones durante el dia. Cada vez que hagas commit en GitHub, la pagina se actualiza.
-
----
-
-## 🔍 Funciones de la pagina
+## Funciones de la pagina
 
 - **Busqueda** por dorsal o nombre del corredor
 - **Filtros** por categoria y evento
 - **Ordenamiento** por columnas (clic en los encabezados)
 - **Responsive** - se ve bien en celular y computadora
-- **Actualizacion** - boton para recargar resultados
+- **Actualizacion** - boton para recargar resultados sin refrescar toda la pagina
 
 ---
 
-## 📁 Estructura del proyecto
+## Estructura del proyecto
 
 ```
 Resultados-ciclismo/
-├── index.html          ← Pagina principal (resultados)
-├── admin.html          ← Panel de administracion
+├── index.html              ← Pagina principal (resultados)
+├── admin.html              ← Panel de ayuda
 ├── css/
-│   └── styles.css      ← Estilos visuales
+│   └── styles.css          ← Estilos visuales
 ├── js/
-│   ├── app.js          ← Logica de busqueda y filtros
-│   └── admin.js        ← Logica del panel admin
+│   ├── app.js              ← Lee el CSV y muestra resultados
+│   └── admin.js            ← Logica del panel admin
 ├── data/
-│   └── resultados.json ← AQUI VAN LOS RESULTADOS
-└── README.md           ← Este archivo
+│   ├── resultados.csv      ← ** AQUI SUBES TUS RESULTADOS **
+│   └── evento.csv          ← Informacion del evento
+└── README.md               ← Este archivo
 ```
 
 ---
 
-## ❓ Preguntas frecuentes
+## Preguntas frecuentes
 
-**¿Cuanto tarda en actualizarse la pagina?**
-Despues de hacer commit en GitHub, los cambios se reflejan en 1-2 minutos.
+**¿Puedo usar Excel directamente?**
+No directamente, pero puedes guardar tu Excel como CSV (Guardar como > CSV) y subir ese archivo.
+
+**¿Cuanto tarda en actualizarse?**
+1-2 minutos despues de subir el archivo a GitHub.
 
 **¿Puedo tener varias competencias?**
-Si, simplemente cambia la informacion del evento y los resultados cada vez que tengas una nueva competencia.
-
-**¿Se puede usar sin internet?**
-No, la pagina necesita estar en linea para funcionar.
+Si, simplemente reemplaza el CSV cada vez que tengas una nueva competencia.
 
 **¿Tiene costo?**
 No, GitHub Pages es completamente gratuito.
 
----
-
-## 🛠 Soporte
-
-Si tienes problemas o necesitas ayuda, puedes crear un Issue en el repositorio o contactar al desarrollador.
+**¿Que pasa si me equivoco en el CSV?**
+Simplemente sube uno nuevo y reemplazara el anterior.

@@ -1,4 +1,5 @@
 // ===== CYCLING RESULTS APP =====
+// Lee directamente un archivo CSV - no necesitas saber JSON
 
 (function() {
     'use strict';
@@ -65,31 +66,40 @@
         });
     }
 
-    // Load data from JSON file
+    // ===== LOAD DATA FROM CSV FILE =====
     function loadData() {
         showLoading(true);
-        
-        // Add cache-busting parameter to avoid stale data
-        const cacheBuster = '?t=' + Date.now();
-        
-        fetch('data/resultados.json' + cacheBuster)
-            .then(response => {
-                if (!response.ok) throw new Error('No se pudieron cargar los datos');
-                return response.json();
-            })
-            .then(data => {
-                // Update event info
-                if (data.evento) {
-                    eventTitle.textContent = data.evento.nombre || 'Competencia de Ciclismo';
-                    eventDetails.textContent = formatEventDetails(data.evento);
-                }
 
-                // Load results
-                allResults = data.resultados || [];
-                
+        // Load event config first, then CSV results
+        const cacheBuster = '?t=' + Date.now();
+
+        // Try to load event info from config file
+        fetch('data/evento.csv' + cacheBuster)
+            .then(response => {
+                if (!response.ok) throw new Error('No event config');
+                return response.text();
+            })
+            .then(text => {
+                parseEventConfig(text);
+            })
+            .catch(() => {
+                // No event config, use defaults
+                eventTitle.textContent = 'Resultados de Ciclismo';
+                eventDetails.textContent = '';
+            });
+
+        // Load results from CSV
+        fetch('data/resultados.csv' + cacheBuster)
+            .then(response => {
+                if (!response.ok) throw new Error('No se encontro el archivo CSV');
+                return response.text();
+            })
+            .then(text => {
+                allResults = parseCSV(text);
+
                 // Extract unique categories and events
-                categories = [...new Set(allResults.map(r => r.categoria))].sort();
-                events = [...new Set(allResults.map(r => r.evento))].sort();
+                categories = [...new Set(allResults.map(r => r.categoria).filter(c => c))].sort();
+                events = [...new Set(allResults.map(r => r.evento).filter(e => e))].sort();
 
                 populateFilters();
                 applyFilters();
@@ -101,21 +111,122 @@
                 allResults = [];
                 filteredResults = [];
                 eventTitle.textContent = 'Resultados de Ciclismo';
-                eventDetails.textContent = 'Sube los resultados desde el panel de administracion';
+                eventDetails.textContent = 'Sube el archivo resultados.csv a la carpeta data/';
                 renderResults();
             });
     }
 
-    function formatEventDetails(evento) {
-        const parts = [];
-        if (evento.fecha) parts.push(evento.fecha);
-        if (evento.lugar) parts.push(evento.lugar);
-        if (evento.distancia) parts.push(evento.distancia);
-        return parts.join(' | ');
+    // ===== CSV PARSER =====
+    function parseCSV(text) {
+        const lines = text.split(/\r?\n/).filter(line => line.trim());
+
+        if (lines.length < 2) return [];
+
+        // Parse header row
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+
+        // Map common column names (flexible - accepts different names)
+        const colMap = {
+            posicion: findColumn(headers, ['posicion', 'pos', 'lugar', 'position', 'place', '#']),
+            dorsal: findColumn(headers, ['dorsal', 'numero', 'num', 'bib', 'number', 'no']),
+            nombre: findColumn(headers, ['nombre', 'name', 'corredor', 'ciclista', 'rider', 'atleta']),
+            categoria: findColumn(headers, ['categoria', 'cat', 'category', 'grupo', 'group']),
+            evento: findColumn(headers, ['evento', 'event', 'distancia', 'distance', 'modalidad', 'ruta']),
+            tiempo: findColumn(headers, ['tiempo', 'time', 'hora', 'crono', 'finish']),
+            diferencia: findColumn(headers, ['diferencia', 'dif', 'diff', 'gap', 'delta'])
+        };
+
+        // Parse data rows
+        const results = [];
+        for (let i = 1; i < lines.length; i++) {
+            const values = parseCSVLine(lines[i]);
+            if (values.length === 0) continue;
+
+            const row = {
+                posicion: getVal(values, colMap.posicion, i),
+                dorsal: getVal(values, colMap.dorsal, ''),
+                nombre: getVal(values, colMap.nombre, ''),
+                categoria: getVal(values, colMap.categoria, ''),
+                evento: getVal(values, colMap.evento, ''),
+                tiempo: getVal(values, colMap.tiempo, ''),
+                diferencia: getVal(values, colMap.diferencia, '-')
+            };
+
+            // Convert numeric fields
+            row.posicion = parseInt(row.posicion) || i;
+            row.dorsal = parseInt(row.dorsal) || 0;
+
+            // Skip rows without a name
+            if (row.nombre.trim()) {
+                results.push(row);
+            }
+        }
+
+        return results;
     }
 
+    // Find a column index by trying multiple possible header names
+    function findColumn(headers, possibleNames) {
+        for (const name of possibleNames) {
+            const idx = headers.indexOf(name);
+            if (idx !== -1) return idx;
+        }
+        return -1;
+    }
+
+    // Get value from array by index, with default
+    function getVal(values, index, defaultVal) {
+        if (index === -1 || index >= values.length) return defaultVal;
+        return values[index].trim() || defaultVal;
+    }
+
+    // Parse a single CSV line (handles quoted values with commas inside)
+    function parseCSVLine(line) {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                result.push(current);
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        result.push(current);
+        return result;
+    }
+
+    // Parse event configuration from CSV
+    function parseEventConfig(text) {
+        const lines = text.split(/\r?\n/).filter(line => line.trim());
+        const config = {};
+
+        for (const line of lines) {
+            const parts = line.split(',');
+            if (parts.length >= 2) {
+                const key = parts[0].trim().toLowerCase();
+                const value = parts.slice(1).join(',').trim();
+                config[key] = value;
+            }
+        }
+
+        const nombre = config.nombre || config.evento || config.name || 'Competencia de Ciclismo';
+        eventTitle.textContent = nombre;
+
+        const detailParts = [];
+        if (config.fecha || config.date) detailParts.push(config.fecha || config.date);
+        if (config.lugar || config.place || config.ciudad) detailParts.push(config.lugar || config.place || config.ciudad);
+        if (config.distancia || config.distance) detailParts.push(config.distancia || config.distance);
+        eventDetails.textContent = detailParts.join(' | ');
+    }
+
+    // ===== FILTERS =====
     function populateFilters() {
-        // Clear existing options (keep the first "all" option)
         categorySelect.innerHTML = '<option value="">Todas las categorias</option>';
         eventSelect.innerHTML = '<option value="">Todos los eventos</option>';
 
@@ -140,15 +251,11 @@
         const selectedEvent = eventSelect.value;
 
         filteredResults = allResults.filter(result => {
-            // Search by dorsal or name
-            const matchesSearch = !searchTerm || 
+            const matchesSearch = !searchTerm ||
                 result.dorsal.toString().includes(searchTerm) ||
                 result.nombre.toLowerCase().includes(searchTerm);
 
-            // Filter by category
             const matchesCategory = !selectedCategory || result.categoria === selectedCategory;
-
-            // Filter by event
             const matchesEvent = !selectedEvent || result.evento === selectedEvent;
 
             return matchesSearch && matchesCategory && matchesEvent;
@@ -165,18 +272,16 @@
         renderResults();
     }
 
+    // ===== RENDER =====
     function renderResults() {
-        // Sort results
         const sorted = sortResults([...filteredResults]);
 
-        // Update count
         if (filteredResults.length === allResults.length) {
             resultsCount.textContent = `Mostrando todos los resultados (${allResults.length})`;
         } else {
             resultsCount.textContent = `Mostrando ${filteredResults.length} de ${allResults.length} resultados`;
         }
 
-        // Show/hide empty state
         if (sorted.length === 0 && allResults.length > 0) {
             emptyState.style.display = 'block';
             tableWrapper.style.display = 'none';
@@ -223,12 +328,12 @@
         `).join('');
     }
 
+    // ===== SORTING =====
     function sortResults(results) {
         return results.sort((a, b) => {
             let valA = a[currentSort.field];
             let valB = b[currentSort.field];
 
-            // Handle numeric fields
             if (currentSort.field === 'posicion' || currentSort.field === 'dorsal') {
                 valA = Number(valA) || 0;
                 valB = Number(valB) || 0;
@@ -276,7 +381,6 @@
         }
     }
 
-    // Utility: Debounce
     function debounce(func, wait) {
         let timeout;
         return function(...args) {
