@@ -194,7 +194,8 @@
             const line = lines[i];
             const trimmed = line.trim();
 
-            if (!trimmed) {
+            // Skip empty lines or lines that are just separators
+            if (!trimmed || /^[;,\t\s]+$/.test(trimmed)) {
                 headerFound = false;
                 continue;
             }
@@ -203,8 +204,8 @@
             const parts = splitLine(line, separator);
 
             // Is this a category header?
-            if (isCategoryHeader(trimmed, parts)) {
-                currentCategory = trimmed;
+            if (isCategoryHeader(trimmed, parts, separator)) {
+                currentCategory = parts.filter(p => p.trim().length > 0)[0] || trimmed;
                 headerFound = false;
                 continue;
             }
@@ -235,6 +236,18 @@
                         tiempo: formatTime(tiempo),
                         diferencia: ''
                     });
+                } else if (pos && ['DSQ', 'DNF', 'DNS', 'OTL'].includes(pos.trim().toUpperCase()) && nombre.trim()) {
+                    // Descalificado, no termino, no salio, fuera de tiempo
+                    results.push({
+                        posicion: 999,
+                        dorsal: parseInt(numero) || 0,
+                        nombre: nombre.trim(),
+                        categoria: currentCategory,
+                        equipo: equipo ? equipo.trim() : '',
+                        evento: eventoName,
+                        tiempo: pos.trim().toUpperCase(),
+                        diferencia: ''
+                    });
                 }
             }
         }
@@ -247,8 +260,10 @@
 
     function detectSeparator(line) {
         const tabs = (line.match(/\t/g) || []).length;
+        const semicolons = (line.match(/;/g) || []).length;
         const commas = (line.match(/,/g) || []).length;
         if (tabs >= 2) return '\t';
+        if (semicolons >= 2) return ';';
         if (commas >= 2) return ',';
         if (/\s{2,}/.test(line)) return 'spaces';
         return '\t';
@@ -264,12 +279,34 @@
         return line.split(separator);
     }
 
-    function isCategoryHeader(trimmed, parts) {
+    // Detect the main separator used in the file (check first few lines)
+    function detectFileSeparator(text) {
+        const lines = text.split(/\r?\n/).filter(l => l.trim());
+        let tabCount = 0, semiCount = 0, commaCount = 0;
+        const checkLines = lines.slice(0, Math.min(10, lines.length));
+        checkLines.forEach(line => {
+            tabCount += (line.match(/\t/g) || []).length;
+            semiCount += (line.match(/;/g) || []).length;
+            commaCount += (line.match(/,/g) || []).length;
+        });
+        if (semiCount > tabCount && semiCount > commaCount) return ';';
+        if (tabCount > commaCount) return '\t';
+        if (commaCount > 0) return ',';
+        return 'spaces';
+    }
+
+    function isCategoryHeader(trimmed, parts, separator) {
+        // Lines like "EXPERTOS MASCULINO;;;;" - category with empty separators
+        const nonEmpty = parts.filter(p => p.trim().length > 0);
+        if (nonEmpty.length === 1 && isNaN(parseInt(nonEmpty[0])) && nonEmpty[0].length > 1) {
+            return true;
+        }
+        // Single value line (no separators)
         if (parts.length <= 2 && trimmed.length > 0 && isNaN(parseInt(parts[0]))) {
             return true;
         }
-        if (parts.length >= 3) return false;
-        if (/^\d+$/.test(parts[0])) return false;
+        if (parts.length >= 3 && nonEmpty.length >= 3) return false;
+        if (/^\d+$/.test(parts[0].trim())) return false;
         return true;
     }
 
