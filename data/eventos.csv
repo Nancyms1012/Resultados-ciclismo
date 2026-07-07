@@ -1,3 +1,3 @@
-archivo,evento
-resultados_endurance.csv,Endurance
-resultados_reto.csv,Reto
+archivo,evento,logo,descripcion
+resultados_endurance.csv,Endurance,logo_endurance.png,Endurance MTB Challenge
+resultados_reto.csv,Reto,logo_reto.png,Reto Ciclista 2025

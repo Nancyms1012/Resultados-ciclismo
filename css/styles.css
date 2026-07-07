@@ -731,3 +731,155 @@ body {
     gap: 8px;
     margin-top: 12px;
 }
+
+
+/* ===== LANDING PAGE ===== */
+.landing-body {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    min-height: 100vh;
+}
+
+.landing-header {
+    text-align: center;
+    padding: 60px 20px 30px;
+    color: var(--white);
+}
+
+.landing-title {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.landing-subtitle {
+    font-size: 1rem;
+    opacity: 0.7;
+    text-transform: capitalize;
+}
+
+.landing-main {
+    padding: 20px 0 60px;
+}
+
+.landing-choose {
+    text-align: center;
+    color: var(--white);
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    font-weight: 400;
+    margin-bottom: 32px;
+    opacity: 0.9;
+}
+
+.events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.event-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--dark);
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 24px;
+    text-align: center;
+}
+
+.event-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+}
+
+.event-card-logo {
+    width: 160px;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.event-card-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.event-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+}
+
+.event-card-info {
+    margin-bottom: 20px;
+}
+
+.event-card-name {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.event-card-desc {
+    font-size: 0.9rem;
+    color: var(--gray-700);
+}
+
+.event-card-action .btn {
+    padding: 12px 32px;
+    font-size: 1rem;
+}
+
+/* Landing page loading/empty in dark mode */
+.landing-body .loading-state,
+.landing-body .empty-state {
+    color: rgba(255,255,255,0.7);
+}
+
+.landing-body .spinner {
+    border-color: rgba(255,255,255,0.2);
+    border-top-color: var(--white);
+}
+
+.landing-body .footer {
+    background: transparent;
+    color: rgba(255,255,255,0.4);
+}
+
+@media (max-width: 600px) {
+    .landing-title {
+        font-size: 1.8rem;
+    }
+
+    .landing-header {
+        padding: 40px 20px 20px;
+    }
+
+    .events-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .event-card {
+        padding: 24px 20px;
+    }
+
+    .event-card-logo {
+        width: 120px;
+        height: 120px;
+    }
+}
