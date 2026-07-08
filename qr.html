@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR - Resultados de Ciclismo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #ffffff;
+            padding: 40px 20px;
+        }
+        .print-container {
+            text-align: center;
+            max-width: 500px;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            color: #1a1a2e;
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 32px;
+        }
+        #qr-code {
+            margin: 0 auto 24px;
+            display: flex;
+            justify-content: center;
+        }
+        #qr-code svg {
+            width: 300px;
+            height: 300px;
+        }
+        .url-display {
+            font-size: 0.9rem;
+            color: #888;
+            word-break: break-all;
+            margin-bottom: 32px;
+            padding: 10px 16px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        .instructions {
+            font-size: 1.2rem;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .instructions-sub {
+            font-size: 0.95rem;
+            color: #666;
+        }
+        .btn-print {
+            margin-top: 32px;
+            padding: 14px 40px;
+            font-size: 1rem;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .btn-print:hover {
+            background: #1557b0;
+        }
+        @media print {
+            .btn-print { display: none; }
+            body { padding: 60px 20px; }
+            #qr-code svg { width: 400px; height: 400px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="print-container">
+        <h1>Resultados en Vivo</h1>
+        <p class="subtitle">Escanea el codigo QR con tu celular</p>
+
+        <div id="qr-code"></div>
+
+        <p class="url-display" id="url-display"></p>
+
+        <p class="instructions">Consulta tu tiempo y posicion</p>
+        <p class="instructions-sub">Busca por dorsal o nombre</p>
+
+        <button class="btn-print" onclick="window.print()">Imprimir QR</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script>
+        var SITE_URL = 'https://nancyms1012.github.io/Resultados-ciclismo/';
+
+        document.getElementById('url-display').textContent = SITE_URL;
+
+        var qr = qrcode(0, 'M');
+        qr.addData(SITE_URL);
+        qr.make();
+        document.getElementById('qr-code').innerHTML = qr.createSvgTag(8, 0);
+    </script>
+</body>
+</html>

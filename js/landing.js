@@ -3,18 +3,32 @@
 (function() {
     'use strict';
 
+    const SITE_URL = 'https://nancyms1012.github.io/Resultados-ciclismo/';
+
     const eventsGrid = document.getElementById('events-grid');
     const loadingState = document.getElementById('landing-loading');
     const emptyState = document.getElementById('landing-empty');
     const landingDate = document.getElementById('landing-date');
+    const qrContainer = document.getElementById('qr-code');
 
     // Show today's date
     const today = new Date();
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     landingDate.textContent = today.toLocaleDateString('es-ES', options);
 
-    // Load events
-    document.addEventListener('DOMContentLoaded', loadEvents);
+    // Generate QR code
+    document.addEventListener('DOMContentLoaded', function() {
+        loadEvents();
+        generateQR();
+    });
+
+    function generateQR() {
+        if (typeof qrcode === 'undefined' || !qrContainer) return;
+        var qr = qrcode(0, 'M');
+        qr.addData(SITE_URL);
+        qr.make();
+        qrContainer.innerHTML = qr.createSvgTag(5, 0);
+    }
 
     function loadEvents() {
         const cacheBuster = '?t=' + Date.now();

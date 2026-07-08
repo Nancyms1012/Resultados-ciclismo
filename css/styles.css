@@ -883,3 +883,39 @@ body {
         height: 120px;
     }
 }
+
+
+/* ===== QR CODE SECTION ===== */
+.qr-section {
+    padding: 20px 0 40px;
+}
+
+.qr-card {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    text-align: center;
+    max-width: 240px;
+    margin: 0 auto;
+    backdrop-filter: blur(4px);
+}
+
+.qr-code {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.qr-code svg {
+    width: 180px;
+    height: 180px;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.qr-text {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.85rem;
+}
