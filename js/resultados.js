@@ -340,10 +340,19 @@
         const searchTerm = searchInput.value.trim().toLowerCase();
         const selectedCat = categorySelect.value;
         const selectedEquipo = equipoSelect.value;
+        const isNumericSearch = /^\d+$/.test(searchTerm);
+
         filteredResults = allResults.filter(r => {
-            const matchSearch = !searchTerm ||
-                r.dorsal.toString().includes(searchTerm) ||
-                r.nombre.toLowerCase().includes(searchTerm);
+            let matchSearch = true;
+            if (searchTerm) {
+                if (isNumericSearch) {
+                    // Exact dorsal match for numbers
+                    matchSearch = r.dorsal.toString() === searchTerm;
+                } else {
+                    // Partial match for names
+                    matchSearch = r.nombre.toLowerCase().includes(searchTerm);
+                }
+            }
             const matchCat = !selectedCat || r.categoria === selectedCat;
             const matchEquipo = !selectedEquipo || r.equipo === selectedEquipo;
             return matchSearch && matchCat && matchEquipo;
