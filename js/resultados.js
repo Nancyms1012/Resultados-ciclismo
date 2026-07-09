@@ -11,7 +11,7 @@
     // State
     let allResults = [];
     let filteredResults = [];
-    let currentSort = { field: 'default', direction: 'asc' };
+    let currentSort = { field: 'tiempo', direction: 'asc' };
     let categories = [];
     let equipos = [];
 
@@ -239,23 +239,25 @@
 
 
     function calculateDifferences(results) {
-        const byCategory = {};
+        // Calculate difference against the overall fastest time (General Classification)
+        // First, find the fastest time across all results
+        let fastestTime = Infinity;
         results.forEach(r => {
-            if (!byCategory[r.categoria]) byCategory[r.categoria] = [];
-            byCategory[r.categoria].push(r);
+            if (r.posicion !== 999 && r.tiempo) {
+                const t = timeToSeconds(r.tiempo);
+                if (t < fastestTime) fastestTime = t;
+            }
         });
-        Object.values(byCategory).forEach(group => {
-            group.sort((a, b) => a.posicion - b.posicion);
-            if (group.length > 0 && group[0].tiempo && group[0].posicion !== 999) {
-                const firstTime = timeToSeconds(group[0].tiempo);
-                group[0].diferencia = '-';
-                for (let i = 1; i < group.length; i++) {
-                    if (group[i].posicion === 999) {
-                        group[i].diferencia = group[i].tiempo;
-                    } else if (group[i].tiempo) {
-                        const diff = timeToSeconds(group[i].tiempo) - firstTime;
-                        group[i].diferencia = '+' + secondsToTime(diff);
-                    }
+
+        results.forEach(r => {
+            if (r.posicion === 999) {
+                r.diferencia = r.tiempo;
+            } else if (r.tiempo) {
+                const t = timeToSeconds(r.tiempo);
+                if (t === fastestTime) {
+                    r.diferencia = '-';
+                } else {
+                    r.diferencia = '+' + secondsToTime(t - fastestTime);
                 }
             }
         });
@@ -350,9 +352,11 @@
     }
 
     function renderTable(results) {
-        resultsBody.innerHTML = results.map(r => `
+        resultsBody.innerHTML = results.map((r, idx) => {
+            const posGeneral = r.posicion === 999 ? '-' : (idx + 1);
+            return `
             <tr>
-                <td><span class="position-badge position-${r.posicion <= 3 ? r.posicion : ''}">${r.posicion === 999 ? '-' : r.posicion}</span></td>
+                <td><span class="position-badge position-${(idx + 1) <= 3 && r.posicion !== 999 ? (idx + 1) : ''}">${posGeneral}</span></td>
                 <td><span class="dorsal-badge">${r.dorsal}</span></td>
                 <td><strong>${r.nombre}</strong></td>
                 <td><span class="category-tag">${r.categoria}</span></td>
@@ -360,13 +364,15 @@
                 <td class="time-display">${r.posicion === 999 ? r.tiempo : (r.tiempo || '--:--:--')}</td>
                 <td class="diff-display">${r.posicion === 999 ? r.tiempo : (r.diferencia || '-')}</td>
             </tr>
-        `).join('');
+        `}).join('');
     }
 
     function renderCards(results) {
-        resultsCards.innerHTML = results.map(r => `
+        resultsCards.innerHTML = results.map((r, idx) => {
+            const posGeneral = r.posicion === 999 ? '-' : (idx + 1);
+            return `
             <div class="result-card">
-                <div class="card-position">${r.posicion === 999 ? '-' : r.posicion}</div>
+                <div class="card-position">${posGeneral}</div>
                 <div class="card-info">
                     <h4><span class="dorsal-badge">${r.dorsal}</span> ${r.nombre}</h4>
                     <div class="card-meta">${r.categoria}${r.equipo ? ' | ' + r.equipo : ''}</div>
@@ -376,21 +382,11 @@
                     <div class="diff">${r.posicion === 999 ? '' : (r.diferencia || '')}</div>
                 </div>
             </div>
-        `).join('');
+        `}).join('');
     }
 
     // ===== SORTING =====
     function sortResults(results) {
-        // Default sort: by category order (as they appear in file) then by position
-        if (currentSort.field === 'default') {
-            return results.sort((a, b) => {
-                const catIdxA = categories.indexOf(a.categoria);
-                const catIdxB = categories.indexOf(b.categoria);
-                if (catIdxA !== catIdxB) return catIdxA - catIdxB;
-                return (a.posicion || 999) - (b.posicion || 999);
-            });
-        }
-
         return results.sort((a, b) => {
             let valA = a[currentSort.field];
             let valB = b[currentSort.field];
