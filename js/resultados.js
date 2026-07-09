@@ -20,6 +20,7 @@
     const searchInput = document.getElementById('search-text');
     const categorySelect = document.getElementById('filter-category');
     const equipoSelect = document.getElementById('filter-equipo');
+    const genderSelect = document.getElementById('filter-gender');
     const btnSearch = document.getElementById('btn-search');
     const btnClear = document.getElementById('btn-clear');
     const btnRefresh = document.getElementById('btn-refresh');
@@ -55,6 +56,7 @@
         searchInput.addEventListener('input', debounce(applyFilters, 300));
         categorySelect.addEventListener('change', applyFilters);
         equipoSelect.addEventListener('change', applyFilters);
+        genderSelect.addEventListener('change', applyFilters);
 
         // View toggle buttons
         document.getElementById('btn-general').addEventListener('click', function() {
@@ -171,6 +173,7 @@
                         dorsal: parseInt(numero) || 0,
                         nombre: nombre.trim(),
                         categoria: currentCategory,
+                        genero: detectGender(currentCategory),
                         equipo: equipo ? equipo.trim() : '',
                         tiempo: formatTime(tiempo),
                         diferencia: ''
@@ -181,6 +184,7 @@
                         dorsal: parseInt(numero) || 0,
                         nombre: nombre.trim(),
                         categoria: currentCategory,
+                        genero: detectGender(currentCategory),
                         equipo: equipo ? equipo.trim() : '',
                         tiempo: pos.trim().toUpperCase(),
                         diferencia: ''
@@ -251,6 +255,18 @@
     }
 
     function pad(n) { return n.toString().padStart(2, '0'); }
+
+    // Detect gender from category name
+    function detectGender(categoria) {
+        const cat = categoria.toLowerCase();
+        if (cat.includes('femen') || cat.includes('mujer') || cat.includes('dama') || cat.includes('female') || cat.includes('women')) {
+            return 'F';
+        }
+        if (cat.includes('mixto') || cat.includes('mixta') || cat.includes('mixed')) {
+            return 'X';
+        }
+        return 'M';
+    }
 
 
     function calculateDifferences(results) {
@@ -340,22 +356,22 @@
         const searchTerm = searchInput.value.trim().toLowerCase();
         const selectedCat = categorySelect.value;
         const selectedEquipo = equipoSelect.value;
+        const selectedGender = genderSelect.value;
         const isNumericSearch = /^\d+$/.test(searchTerm);
 
         filteredResults = allResults.filter(r => {
             let matchSearch = true;
             if (searchTerm) {
                 if (isNumericSearch) {
-                    // Exact dorsal match for numbers
                     matchSearch = r.dorsal.toString() === searchTerm;
                 } else {
-                    // Partial match for names
                     matchSearch = r.nombre.toLowerCase().includes(searchTerm);
                 }
             }
             const matchCat = !selectedCat || r.categoria === selectedCat;
             const matchEquipo = !selectedEquipo || r.equipo === selectedEquipo;
-            return matchSearch && matchCat && matchEquipo;
+            const matchGender = !selectedGender || r.genero === selectedGender;
+            return matchSearch && matchCat && matchEquipo && matchGender;
         });
         renderResults();
     }
@@ -364,6 +380,7 @@
         searchInput.value = '';
         categorySelect.value = '';
         equipoSelect.value = '';
+        genderSelect.value = '';
         filteredResults = [...allResults];
         renderResults();
     }
