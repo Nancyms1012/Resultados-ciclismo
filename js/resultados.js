@@ -11,7 +11,7 @@
     // State
     let allResults = [];
     let filteredResults = [];
-    let currentSort = { field: 'posicion', direction: 'asc' };
+    let currentSort = { field: 'default', direction: 'asc' };
     let categories = [];
     let equipos = [];
 
@@ -88,7 +88,12 @@
             })
             .then(text => {
                 allResults = parseChipTimingFile(text);
-                categories = [...new Set(allResults.map(r => r.categoria).filter(c => c))].sort();
+                // Preserve category order as they appear in the file
+                const seenCats = [];
+                allResults.forEach(r => {
+                    if (r.categoria && !seenCats.includes(r.categoria)) seenCats.push(r.categoria);
+                });
+                categories = seenCats;
                 equipos = [...new Set(allResults.map(r => r.equipo).filter(e => e))].sort();
                 populateFilters();
                 applyFilters();
@@ -376,6 +381,16 @@
 
     // ===== SORTING =====
     function sortResults(results) {
+        // Default sort: by category order (as they appear in file) then by position
+        if (currentSort.field === 'default') {
+            return results.sort((a, b) => {
+                const catIdxA = categories.indexOf(a.categoria);
+                const catIdxB = categories.indexOf(b.categoria);
+                if (catIdxA !== catIdxB) return catIdxA - catIdxB;
+                return (a.posicion || 999) - (b.posicion || 999);
+            });
+        }
+
         return results.sort((a, b) => {
             let valA = a[currentSort.field];
             let valB = b[currentSort.field];
