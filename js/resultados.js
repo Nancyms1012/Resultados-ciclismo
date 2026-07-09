@@ -12,6 +12,7 @@
     let allResults = [];
     let filteredResults = [];
     let currentSort = { field: 'tiempo', direction: 'asc' };
+    let currentView = 'general'; // 'general' or 'categoria'
     let categories = [];
     let equipos = [];
 
@@ -54,6 +55,20 @@
         searchInput.addEventListener('input', debounce(applyFilters, 300));
         categorySelect.addEventListener('change', applyFilters);
         equipoSelect.addEventListener('change', applyFilters);
+
+        // View toggle buttons
+        document.getElementById('btn-general').addEventListener('click', function() {
+            currentView = 'general';
+            this.classList.add('active');
+            document.getElementById('btn-categoria').classList.remove('active');
+            renderResults();
+        });
+        document.getElementById('btn-categoria').addEventListener('click', function() {
+            currentView = 'categoria';
+            this.classList.add('active');
+            document.getElementById('btn-general').classList.remove('active');
+            renderResults();
+        });
 
         document.querySelectorAll('.sortable').forEach(th => {
             th.addEventListener('click', function() {
@@ -239,8 +254,7 @@
 
 
     function calculateDifferences(results) {
-        // Calculate difference against the overall fastest time (General Classification)
-        // First, find the fastest time across all results
+        // 1. General Classification: difference against overall fastest
         let fastestTime = Infinity;
         results.forEach(r => {
             if (r.posicion !== 999 && r.tiempo) {
@@ -248,18 +262,37 @@
                 if (t < fastestTime) fastestTime = t;
             }
         });
-
         results.forEach(r => {
             if (r.posicion === 999) {
-                r.diferencia = r.tiempo;
+                r.difGeneral = r.tiempo;
             } else if (r.tiempo) {
                 const t = timeToSeconds(r.tiempo);
-                if (t === fastestTime) {
-                    r.diferencia = '-';
-                } else {
-                    r.diferencia = '+' + secondsToTime(t - fastestTime);
-                }
+                r.difGeneral = (t === fastestTime) ? '-' : '+' + secondsToTime(t - fastestTime);
+            } else {
+                r.difGeneral = '-';
             }
+        });
+
+        // 2. Category Classification: difference against first in each category
+        const byCategory = {};
+        results.forEach(r => {
+            if (!byCategory[r.categoria]) byCategory[r.categoria] = [];
+            byCategory[r.categoria].push(r);
+        });
+        Object.values(byCategory).forEach(group => {
+            group.sort((a, b) => timeToSeconds(a.tiempo) - timeToSeconds(b.tiempo));
+            const firstTime = group.length > 0 && group[0].posicion !== 999 ? timeToSeconds(group[0].tiempo) : Infinity;
+            group.forEach((r, i) => {
+                if (r.posicion === 999) {
+                    r.difCategoria = r.tiempo;
+                } else if (r.tiempo && firstTime !== Infinity) {
+                    const t = timeToSeconds(r.tiempo);
+                    r.difCategoria = (t === firstTime) ? '-' : '+' + secondsToTime(t - firstTime);
+                } else {
+                    r.difCategoria = '-';
+                }
+                r.posCategoria = r.posicion === 999 ? 999 : (i + 1);
+            });
         });
     }
 
@@ -353,33 +386,37 @@
 
     function renderTable(results) {
         resultsBody.innerHTML = results.map((r, idx) => {
-            const posGeneral = r.posicion === 999 ? '-' : (idx + 1);
+            const isGeneral = (currentView === 'general');
+            const pos = r.posicion === 999 ? '-' : (isGeneral ? (idx + 1) : r.posCategoria);
+            const dif = r.posicion === 999 ? r.tiempo : (isGeneral ? r.difGeneral : r.difCategoria);
             return `
             <tr>
-                <td><span class="position-badge position-${(idx + 1) <= 3 && r.posicion !== 999 ? (idx + 1) : ''}">${posGeneral}</span></td>
+                <td><span class="position-badge position-${pos <= 3 && r.posicion !== 999 ? pos : ''}">${pos}</span></td>
                 <td><span class="dorsal-badge">${r.dorsal}</span></td>
                 <td><strong>${r.nombre}</strong></td>
                 <td><span class="category-tag">${r.categoria}</span></td>
                 <td>${r.equipo}</td>
                 <td class="time-display">${r.posicion === 999 ? r.tiempo : (r.tiempo || '--:--:--')}</td>
-                <td class="diff-display">${r.posicion === 999 ? r.tiempo : (r.diferencia || '-')}</td>
+                <td class="diff-display">${dif || '-'}</td>
             </tr>
         `}).join('');
     }
 
     function renderCards(results) {
         resultsCards.innerHTML = results.map((r, idx) => {
-            const posGeneral = r.posicion === 999 ? '-' : (idx + 1);
+            const isGeneral = (currentView === 'general');
+            const pos = r.posicion === 999 ? '-' : (isGeneral ? (idx + 1) : r.posCategoria);
+            const dif = r.posicion === 999 ? '' : (isGeneral ? r.difGeneral : r.difCategoria);
             return `
             <div class="result-card">
-                <div class="card-position">${posGeneral}</div>
+                <div class="card-position">${pos}</div>
                 <div class="card-info">
                     <h4><span class="dorsal-badge">${r.dorsal}</span> ${r.nombre}</h4>
                     <div class="card-meta">${r.categoria}${r.equipo ? ' | ' + r.equipo : ''}</div>
                 </div>
                 <div class="card-time">
                     <div class="time">${r.posicion === 999 ? r.tiempo : (r.tiempo || '--:--:--')}</div>
-                    <div class="diff">${r.posicion === 999 ? '' : (r.diferencia || '')}</div>
+                    <div class="diff">${dif || ''}</div>
                 </div>
             </div>
         `}).join('');
@@ -387,6 +424,17 @@
 
     // ===== SORTING =====
     function sortResults(results) {
+        if (currentView === 'categoria') {
+            // Sort by category order, then by time within category
+            return results.sort((a, b) => {
+                const catIdxA = categories.indexOf(a.categoria);
+                const catIdxB = categories.indexOf(b.categoria);
+                if (catIdxA !== catIdxB) return catIdxA - catIdxB;
+                return timeToSeconds(a.tiempo) - timeToSeconds(b.tiempo);
+            });
+        }
+
+        // General classification: sort by time (or custom sort)
         return results.sort((a, b) => {
             let valA = a[currentSort.field];
             let valB = b[currentSort.field];

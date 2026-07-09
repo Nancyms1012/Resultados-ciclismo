@@ -919,3 +919,46 @@ body {
     color: rgba(255,255,255,0.8);
     font-size: 0.85rem;
 }
+
+
+/* ===== VIEW TOGGLE BUTTONS ===== */
+.view-toggle {
+    display: inline-flex;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 2px solid var(--primary);
+    margin-right: 8px;
+}
+
+.btn-toggle {
+    padding: 8px 16px;
+    border: none;
+    background: var(--white);
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-main);
+    transition: all 0.2s;
+}
+
+.btn-toggle:hover {
+    background: var(--primary-light);
+}
+
+.btn-toggle.active {
+    background: var(--primary);
+    color: var(--white);
+}
+
+@media (max-width: 768px) {
+    .results-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .view-toggle {
+        margin-right: 0;
+    }
+}
