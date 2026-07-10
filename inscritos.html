@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscritos - Competencia de Ciclismo</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <svg class="logo-icon" viewBox="0 0 64 64" width="40" height="40">
+                        <circle cx="16" cy="44" r="12" fill="none" stroke="currentColor" stroke-width="3"/>
+                        <circle cx="48" cy="44" r="12" fill="none" stroke="currentColor" stroke-width="3"/>
+                        <path d="M16 44 L28 20 L38 20 L48 44" fill="none" stroke="currentColor" stroke-width="3"/>
+                        <path d="M28 20 L32 44 L48 44" fill="none" stroke="currentColor" stroke-width="3"/>
+                    </svg>
+                    <div>
+                        <h1 class="site-title">Inscritos</h1>
+                        <p class="site-subtitle" id="event-subtitle"></p>
+                    </div>
+                </div>
+                <nav class="nav">
+                    <a href="index.html" class="nav-link">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+                            <path d="M15 18l-6-6 6-6"/>
+                        </svg>
+                        Resultados
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search and Filters -->
+    <section class="filters-section" id="inscritos">
+        <div class="container">
+            <div class="filters-card">
+                <h3 class="filters-title">Buscar Inscrito</h3>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label for="search-text">Dorsal o Nombre</label>
+                        <input type="text" id="search-text" placeholder="Ej: 123 o Juan..." autocomplete="off">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-category">Categoria</label>
+                        <select id="filter-category">
+                            <option value="">Todas las categorias</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-equipo">Equipo</label>
+                        <select id="filter-equipo">
+                            <option value="">Todos los equipos</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-evento">Evento</label>
+                        <select id="filter-evento">
+                            <option value="">Todos los eventos</option>
+                        </select>
+                    </div>
+                    <div class="filter-group filter-actions">
+                        <button id="btn-search" class="btn btn-primary">Buscar</button>
+                        <button id="btn-clear" class="btn btn-secondary">Limpiar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Table -->
+    <section class="results-section">
+        <div class="container">
+            <div class="results-header">
+                <h3 id="results-count">Cargando inscritos...</h3>
+                <div class="results-actions">
+                    <button id="btn-refresh" class="btn btn-outline" title="Actualizar">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 4v6h-6M1 20v-6h6"/>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                        </svg>
+                        Actualizar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Cards View -->
+            <div id="results-cards" class="results-cards">
+            </div>
+
+            <!-- Desktop Table View -->
+            <div class="table-wrapper">
+                <table id="results-table" class="results-table">
+                    <thead>
+                        <tr>
+                            <th class="sortable" data-sort="dorsal">Dorsal</th>
+                            <th class="sortable" data-sort="nombre">Nombre</th>
+                            <th class="sortable" data-sort="categoria">Categoria</th>
+                            <th class="sortable" data-sort="equipo">Equipo</th>
+                            <th class="sortable" data-sort="evento">Evento</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-body">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.35-4.35"/>
+                </svg>
+                <h4>No se encontraron inscritos</h4>
+                <p>Intenta con otros terminos de busqueda o cambia los filtros</p>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-state" class="loading-state">
+                <div class="spinner"></div>
+                <p>Cargando inscritos...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- QR Section -->
+    <section class="qr-section">
+        <div class="container">
+            <div class="qr-card">
+                <div id="qr-code" class="qr-code"></div>
+                <p class="qr-text">Escanea para ver los inscritos</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Resultados de Ciclismo</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script src="js/inscritos.js?v=1"></script>
+</body>
+</html>
