@@ -57,7 +57,10 @@
         searchInput.addEventListener('input', debounce(applyFilters, 300));
         categorySelect.addEventListener('change', applyFilters);
         equipoSelect.addEventListener('change', applyFilters);
-        eventoSelect.addEventListener('change', applyFilters);
+        eventoSelect.addEventListener('change', function() {
+            updateDependentFilters();
+            applyFilters();
+        });
 
         document.querySelectorAll('.sortable').forEach(th => {
             th.addEventListener('click', function() {
@@ -192,25 +195,50 @@
 
     // ===== FILTERS =====
     function populateFilters() {
-        categorySelect.innerHTML = '<option value="">Todas las categorias</option>';
-        equipoSelect.innerHTML = '<option value="">Todos los equipos</option>';
+        // Evento filter (always shows all events)
         eventoSelect.innerHTML = '<option value="">Todos los eventos</option>';
-
-        categories.forEach(cat => {
-            const opt = document.createElement('option');
-            opt.value = cat; opt.textContent = cat;
-            categorySelect.appendChild(opt);
-        });
-        equipos.forEach(eq => {
-            const opt = document.createElement('option');
-            opt.value = eq; opt.textContent = eq;
-            equipoSelect.appendChild(opt);
-        });
         eventos.forEach(ev => {
             const opt = document.createElement('option');
             opt.value = ev; opt.textContent = ev;
             eventoSelect.appendChild(opt);
         });
+
+        // Update category and equipo based on current event selection
+        updateDependentFilters();
+    }
+
+    function updateDependentFilters() {
+        const selectedEvento = eventoSelect.value;
+
+        // Filter data by selected event to get relevant categories/equipos
+        const relevantData = selectedEvento 
+            ? allInscritos.filter(r => r.evento === selectedEvento)
+            : allInscritos;
+
+        const filteredCats = [...new Set(relevantData.map(r => r.categoria).filter(c => c))].sort();
+        const filteredEqs = [...new Set(relevantData.map(r => r.equipo).filter(e => e))].sort();
+
+        // Save current selections
+        const currentCat = categorySelect.value;
+        const currentEquipo = equipoSelect.value;
+
+        categorySelect.innerHTML = '<option value="">Todas las categorias</option>';
+        filteredCats.forEach(cat => {
+            const opt = document.createElement('option');
+            opt.value = cat; opt.textContent = cat;
+            categorySelect.appendChild(opt);
+        });
+
+        equipoSelect.innerHTML = '<option value="">Todos los equipos</option>';
+        filteredEqs.forEach(eq => {
+            const opt = document.createElement('option');
+            opt.value = eq; opt.textContent = eq;
+            equipoSelect.appendChild(opt);
+        });
+
+        // Restore selection if still valid
+        if (filteredCats.includes(currentCat)) categorySelect.value = currentCat;
+        if (filteredEqs.includes(currentEquipo)) equipoSelect.value = currentEquipo;
     }
 
     function applyFilters() {
