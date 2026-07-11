@@ -1,9 +1,10 @@
-// ===== INSCRITOS PAGE =====
+// ===== INSCRITOS PER EVENT PAGE =====
 
 (function() {
     'use strict';
 
-    const SITE_URL = 'https://nancyms1012.github.io/Resultados-ciclismo/inscritos.html';
+    const params = new URLSearchParams(window.location.search);
+    const eventoNombre = params.get('evento') || '';
 
     // State
     let allInscritos = [];
@@ -11,13 +12,11 @@
     let currentSort = { field: 'dorsal', direction: 'asc' };
     let categories = [];
     let equipos = [];
-    let eventos = [];
 
     // DOM Elements
     const searchInput = document.getElementById('search-text');
     const categorySelect = document.getElementById('filter-category');
     const equipoSelect = document.getElementById('filter-equipo');
-    const eventoSelect = document.getElementById('filter-evento');
     const btnSearch = document.getElementById('btn-search');
     const btnClear = document.getElementById('btn-clear');
     const btnRefresh = document.getElementById('btn-refresh');
@@ -27,24 +26,18 @@
     const emptyState = document.getElementById('empty-state');
     const loadingState = document.getElementById('loading-state');
     const tableWrapper = document.querySelector('.table-wrapper');
+    const eventTitleEl = document.getElementById('event-title');
     const eventSubtitle = document.getElementById('event-subtitle');
-    const qrContainer = document.getElementById('qr-code');
 
-    // Initialize
+    // Set title
+    document.title = eventoNombre + ' - Inscritos';
+    eventTitleEl.textContent = eventoNombre || 'Inscritos';
+
     document.addEventListener('DOMContentLoaded', init);
 
     function init() {
         loadData();
         setupEventListeners();
-        generateQR();
-    }
-
-    function generateQR() {
-        if (typeof qrcode === 'undefined' || !qrContainer) return;
-        var qr = qrcode(0, 'M');
-        qr.addData(SITE_URL);
-        qr.make();
-        qrContainer.innerHTML = qr.createSvgTag(5, 0);
     }
 
     function setupEventListeners() {
@@ -57,10 +50,6 @@
         searchInput.addEventListener('input', debounce(applyFilters, 300));
         categorySelect.addEventListener('change', applyFilters);
         equipoSelect.addEventListener('change', applyFilters);
-        eventoSelect.addEventListener('change', function() {
-            updateDependentFilters();
-            applyFilters();
-        });
 
         document.querySelectorAll('.sortable').forEach(th => {
             th.addEventListener('click', function() {
@@ -77,17 +66,14 @@
         });
     }
 
-    // ===== LOAD DATA =====
     function loadData() {
         showLoading(true);
         const cacheBuster = '?t=' + Date.now();
 
-        // Try multiple possible filenames
         const possibleFiles = [
-            'data/INSCRITOS_TURRI.csv',
             'data/inscritos.csv',
-            'data/Inscritos.csv',
-            'data/INSCRITOS.csv'
+            'data/INSCRITOS.csv',
+            'data/INSCRITOS_TURRI.csv'
         ];
 
         tryLoadFiles(possibleFiles, cacheBuster);
@@ -98,22 +84,29 @@
             showLoading(false);
             allInscritos = [];
             filteredInscritos = [];
-            eventSubtitle.textContent = 'Sube tu archivo de inscritos a la carpeta data/';
+            eventSubtitle.textContent = 'No se encontro archivo de inscritos';
             renderResults();
             return;
         }
 
-        const file = files[0];
-        fetch(file + cacheBuster)
+        fetch(files[0] + cacheBuster)
             .then(response => {
                 if (!response.ok) throw new Error('Not found');
                 return response.text();
             })
             .then(text => {
-                allInscritos = parseCSV(text);
+                const allData = parseCSV(text);
+                // Filter by event name
+                if (eventoNombre) {
+                    allInscritos = allData.filter(r => 
+                        r.evento.toLowerCase() === eventoNombre.toLowerCase()
+                    );
+                } else {
+                    allInscritos = allData;
+                }
+
                 categories = [...new Set(allInscritos.map(r => r.categoria).filter(c => c))].sort();
                 equipos = [...new Set(allInscritos.map(r => r.equipo).filter(e => e))].sort();
-                eventos = [...new Set(allInscritos.map(r => r.evento).filter(e => e))].sort();
                 populateFilters();
                 applyFilters();
                 showLoading(false);
@@ -124,27 +117,21 @@
             });
     }
 
-    // ===== CSV PARSER =====
     function parseCSV(text) {
         const lines = text.split(/\r?\n/).filter(line => line.trim());
         if (lines.length < 2) return [];
 
-        // Detect separator
         const separator = detectSeparator(lines[0]);
-
-        // Parse header
         const headers = lines[0].split(separator).map(h => h.trim().toLowerCase());
 
-        // Map columns flexibly
         const colMap = {
             dorsal: findCol(headers, ['dorsal', 'numero', 'num', 'bib', 'no', 'number', '#']),
-            nombre: findCol(headers, ['nombre', 'name', 'corredor', 'ciclista', 'rider', 'atleta', 'participante', 'nombre participante']),
-            categoria: findCol(headers, ['categoria', 'cat', 'category', 'grupo', 'group']),
-            equipo: findCol(headers, ['equipo', 'team', 'club', 'grupo']),
-            evento: findCol(headers, ['evento', 'event', 'distancia', 'distance', 'modalidad', 'ruta'])
+            nombre: findCol(headers, ['nombre', 'name', 'corredor', 'ciclista', 'participante']),
+            categoria: findCol(headers, ['categoria', 'cat', 'category', 'grupo']),
+            equipo: findCol(headers, ['equipo', 'team', 'club']),
+            evento: findCol(headers, ['evento', 'event', 'distancia', 'modalidad'])
         };
 
-        // Parse rows
         const results = [];
         for (let i = 1; i < lines.length; i++) {
             const values = lines[i].split(separator).map(v => v.trim());
@@ -170,7 +157,6 @@
         const commas = (line.match(/,/g) || []).length;
         if (semicolons >= 2) return ';';
         if (tabs >= 2) return '\t';
-        if (commas >= 2) return ',';
         return ',';
     }
 
@@ -179,7 +165,6 @@
             const idx = headers.indexOf(name);
             if (idx !== -1) return idx;
         }
-        // Try partial match
         for (const name of possibleNames) {
             for (let i = 0; i < headers.length; i++) {
                 if (headers[i].includes(name)) return i;
@@ -193,59 +178,25 @@
         return (values[index] || '').trim();
     }
 
-    // ===== FILTERS =====
     function populateFilters() {
-        // Evento filter (always shows all events)
-        eventoSelect.innerHTML = '<option value="">Todos los eventos</option>';
-        eventos.forEach(ev => {
-            const opt = document.createElement('option');
-            opt.value = ev; opt.textContent = ev;
-            eventoSelect.appendChild(opt);
-        });
-
-        // Update category and equipo based on current event selection
-        updateDependentFilters();
-    }
-
-    function updateDependentFilters() {
-        const selectedEvento = eventoSelect.value;
-
-        // Filter data by selected event to get relevant categories/equipos
-        const relevantData = selectedEvento 
-            ? allInscritos.filter(r => r.evento === selectedEvento)
-            : allInscritos;
-
-        const filteredCats = [...new Set(relevantData.map(r => r.categoria).filter(c => c))].sort();
-        const filteredEqs = [...new Set(relevantData.map(r => r.equipo).filter(e => e))].sort();
-
-        // Save current selections
-        const currentCat = categorySelect.value;
-        const currentEquipo = equipoSelect.value;
-
         categorySelect.innerHTML = '<option value="">Todas las categorias</option>';
-        filteredCats.forEach(cat => {
+        equipoSelect.innerHTML = '<option value="">Todos los equipos</option>';
+        categories.forEach(cat => {
             const opt = document.createElement('option');
             opt.value = cat; opt.textContent = cat;
             categorySelect.appendChild(opt);
         });
-
-        equipoSelect.innerHTML = '<option value="">Todos los equipos</option>';
-        filteredEqs.forEach(eq => {
+        equipos.forEach(eq => {
             const opt = document.createElement('option');
             opt.value = eq; opt.textContent = eq;
             equipoSelect.appendChild(opt);
         });
-
-        // Restore selection if still valid
-        if (filteredCats.includes(currentCat)) categorySelect.value = currentCat;
-        if (filteredEqs.includes(currentEquipo)) equipoSelect.value = currentEquipo;
     }
 
     function applyFilters() {
         const searchTerm = searchInput.value.trim().toLowerCase();
         const selectedCat = categorySelect.value;
         const selectedEquipo = equipoSelect.value;
-        const selectedEvento = eventoSelect.value;
         const isNumericSearch = /^\d+$/.test(searchTerm);
 
         filteredInscritos = allInscritos.filter(r => {
@@ -259,8 +210,7 @@
             }
             const matchCat = !selectedCat || r.categoria === selectedCat;
             const matchEquipo = !selectedEquipo || r.equipo === selectedEquipo;
-            const matchEvento = !selectedEvento || r.evento === selectedEvento;
-            return matchSearch && matchCat && matchEquipo && matchEvento;
+            return matchSearch && matchCat && matchEquipo;
         });
         renderResults();
     }
@@ -269,12 +219,10 @@
         searchInput.value = '';
         categorySelect.value = '';
         equipoSelect.value = '';
-        eventoSelect.value = '';
         filteredInscritos = [...allInscritos];
         renderResults();
     }
 
-    // ===== RENDER =====
     function renderResults() {
         const sorted = sortResults([...filteredInscritos]);
 
@@ -307,7 +255,6 @@
                 <td><strong>${r.nombre}</strong></td>
                 <td><span class="category-tag">${r.categoria}</span></td>
                 <td>${r.equipo}</td>
-                <td>${r.evento}</td>
             </tr>
         `).join('');
     }
@@ -318,13 +265,12 @@
                 <div class="card-position"><span class="dorsal-badge">${r.dorsal || '-'}</span></div>
                 <div class="card-info">
                     <h4>${r.nombre}</h4>
-                    <div class="card-meta">${r.categoria}${r.equipo ? ' | ' + r.equipo : ''}${r.evento ? ' | ' + r.evento : ''}</div>
+                    <div class="card-meta">${r.categoria}${r.equipo ? ' | ' + r.equipo : ''}</div>
                 </div>
             </div>
         `).join('');
     }
 
-    // ===== SORTING =====
     function sortResults(results) {
         return results.sort((a, b) => {
             let valA = a[currentSort.field];
