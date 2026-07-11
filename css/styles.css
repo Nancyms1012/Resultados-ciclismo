@@ -1050,3 +1050,23 @@ body {
     font-weight: 400;
     color: var(--dark);
 }
+
+
+/* ===== VISITOR COUNTER ===== */
+.visitor-counter {
+    position: fixed;
+    bottom: 12px;
+    right: 12px;
+    z-index: 50;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.visitor-counter:hover {
+    opacity: 1;
+}
+
+.visitor-counter img {
+    height: 22px;
+    border-radius: 4px;
+}
