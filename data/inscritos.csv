@@ -51,7 +51,7 @@ Endurance;314;Ronald Gerardo Araya Corrales;X3ME XTREME;Master C Masculino
 Endurance;218;Sergio Campos Valerio;SPOT DETAIL FACTORY TEAM;Master B Masculino
 Endurance;801;Gloriana Maria Quesada Sanchez;TEAM COLONO BIKESTATION KOLBI;Elite Femenino
 Endurance;220;Andres Felipe Arboleda Lopez;SFI GC;Master B Masculino
-Endurance;980;Luis Cartin Gomez;ALQUILERES EIFFEL;E-Bike Masculino +50
+Endurance;980;Luis Cartin Gomez;ALQUILERES EIFFEL;Bike Masculino +50
 Endurance;606;Bryan Fabricio Araya Bermudez;BPT;Open Masculino
 Endurance;8;Dilan Jafet Perez Zamora;TEAM GOCHA;Elite Masculino
 Endurance;608;Marco Vinicio Valverde Jimenez;INDEPENDIENTE;Open Masculino
@@ -134,11 +134,12 @@ Endurance;1010;Luis Jacobo Varela Martinez-Mauricio Andres Alvarez Varela;KILOME
 Endurance;331;Fernando Rivera Araya;AD TRAINING;Master C Masculino
 Endurance;411;Randall Zuniga Leon;SENSORES BIANCHI ;Master D Masculino
 Endurance;127;Marco Alvarez Coto;PROFE REMO TRAINING CLUB;Master A Masculino
+Reto;2703;Santiago Vega Steller;INFINITY BIKE CENTER-CCDR DE NARANJO;Juvenil Masculino
 Endurance;3310;Arnold Andrade Matamoros;Algoritmo Development;Gravel
 Endurance;332;Giovanni Morera Vasquez;ZBC;Master C Masculino
 Endurance;412;Vinicio Antonio Chavarria Castro;DRASANVI AD TRAINIG;Master D Masculino
 Endurance;237;Daniel Brenes Ugalde;;Master B Masculino
-Endurance;981;Didier Miguel Herrera Arroyo;PORTEADORESCHURUCA.SA.;E-Bike Masculino +50
+Endurance;981;Didier Miguel Herrera Arroyo;PORTEADORESCHURUCA.SA.;Bike Masculino +50
 Endurance;413;Maggio Cercone Montero;SFI GASTROCLINICA;Master D Masculino
 Endurance;130;Allan Jose Morales Castillo;TEAM INNOVABIKES SKOLER UH;Master A Masculino
 Endurance;333;Esteban Roman Marin;SFI GASTROCLINICA;Master C Masculino
@@ -148,7 +149,7 @@ Endurance;3340;Michael Olortegui Bonilla;Kilometro Cero;Gravel
 Reto;2705;Bruce Jackson Sanchez Mendez;ACISA SARAPIQUI ;Juvenil Masculino
 Reto;2901;Keysi Paola Pizarro Calderon;ACISA SARAPIQUI;Femenina
 Endurance;982;Diannye Salas Cespedes;TRIMAX;Open E-Bike
-Endurance;983;Wilbert Martin Castillo Solis;INDEPENDIENTE;E-Bike Masculino - 50
+Endurance;983;Wilbert Martin Castillo Solis;INDEPENDIENTE;Bike Masculino - 50
 Endurance;804;Adriana Vanessa Hernandez Calderon;A.R ACADEMIA - MIMI BIKE SHOP;Elite Femenino
 Endurance;134;Daniel Alberto Lalinde Villega;MONTEVERDE;Master A Masculino
 Reto;2217;Diego Andres Loaiza Calderon;CEVICHITO;Expertos B Masculino
@@ -175,7 +176,7 @@ Endurance;143;Alexander Salguero Calvo;CICLO JUAN VINAS - TAPICERIA SANDER;Maste
 Endurance;252;Bryan Alberto Araya Palma;CAPOS MOBI BIKE TEAM;Master B Masculino
 Endurance;144;Richard Stiven Araya Palma;CAPOS MOBI BIKE TEAM;Master A Masculino
 Reto;2411;Mario Efrain Cabezas Torres;TEAM KBZAS;Expertos D Masculino
-Endurance;986;Jorge Eduardo De La Trinidad Solano Zuniga;INDEPENDIENTE;E-Bike Masculino +50
+Endurance;986;Jorge Eduardo De La Trinidad Solano Zuniga;INDEPENDIENTE;Bike Masculino +50
 Endurance;862;Paula Rebeca Solano Barquero;TRIMAX CICLO PARAISO;Master C Femenino
 Endurance;848;Vanessa Maria Ballestero Alcazar;VELOZ CYCLING-ROES-CICLO BOUTIQUE;Master B Femenino
 Endurance;254;Abraham Aguilera Quiros;TEAM COLONO LA FINCA CLIPS ;Master B Masculino
@@ -184,7 +185,6 @@ Reto;2220;Diego Jose Camacho Vargas;CAMAR TEAM;Expertos B Masculino
 Endurance;147;Jonathan Gerardo Carballo Ramirez;7C PEDRGAL ECONOMY RENTA CAR;Master A Masculino
 Reto;2222;Luis Arias Gonzalez;PASTAS ROMA;Expertos B Masculino
 Reto;2517;Douglas Gerardo Aguero Barrantes;ROMA;Expertos E Masculino
-Reto;2108;Gabriel Jose Espinoza Barrios;ROMA;Expertos A Masculino
 Reto;2413;Javier Herrera Porras;PASTAS ROMA;Expertos D Masculino
 Reto;2974;Argerie Guadamuz Garcia;VEINTE24 CYCLING;Femenina B
 Reto;2224;Luis Diego Castro Castro;VEINTE24 CYCLING;Expertos B Masculino
@@ -212,7 +212,6 @@ Endurance;422;German Mauricio Chinchilla Valverde;CBZ DEKRA SECNET;Master D Masc
 Endurance;638;Jorge Enrique Arrieta Vargas;CRCYLING ACADEMY;Open Masculino
 Endurance;157;Greivin Daniel Ruiz Garcia;Z7 CYCLING GROUP;Master A Masculino
 Reto;2615;Gabriel Jose Espinoza Barrios;ROMA;Open Masculino
-Reto;2229;Douglas Gerardo Aguero Barrantes;ROMA;Expertos B Masculino
 Reto;2518;Juan Alvarado Villalobos;TRIMAX CICLING TEAM;Expertos E Masculino
 Reto;2712;Carlos Daniel Leandro Jimenez;AD TRAINING;Juvenil Masculino
 Reto;2011;Jose Roberto Sanchez Urena;COLYPRO-CICLO JUAN VINAS;Expertos Masculino
@@ -245,14 +244,14 @@ Endurance;160;Mario Alfredo Meneses Bonilla;ADN BIKES CR;Master A Masculino
 Endurance;642;Keiner Pereira Montenegro;TEAM TIERNITICOS-ELKY FERRETERIA BIORACER;Open Masculino
 Endurance;811;Adriana Rojas Cubero;ASFALTOS CBZ-DEKRA-MAXXIS-SECNET;Elite Femenino
 Endurance;269;Geovanny Augusto Araya Garcia;TEAM CHAMAN;Master B Masculino
-Endurance;989;Hans Alberto Quiros Soto;TRIMAX;E-Bike Masculino +50
-Endurance;951;Carlos Eduardo Ugalde Porras;TRIMAX CICLYNG;E-Bike Masculino - 50
+Endurance;989;Hans Alberto Quiros Soto;TRIMAX;Bike Masculino +50
+Endurance;951;Carlos Eduardo Ugalde Porras;TRIMAX CICLYNG;Bike Masculino - 50
 Reto;2415;Alex De Los Angeles Garro Carvajal;ACCIPAL MASTER;Expertos D Masculino
 Endurance;350;Kenneth Francisco Hernandez Torres;NINGUNO;Master C Masculino
 Endurance;270;Cesar Gonzalez Solis;WAKAMURA;Master B Masculino
 Endurance;840;Maria Alejandra Gonzalez Quesada;INNOVO-CLETA BOUTIQUE-ELEVEN;Master A Femenino
 Endurance;271;Evaristo Ortega Cordero;TEAM CROSSCOSTARICA- TEAM DANGEROUS;Master B Masculino
-Endurance;952;Aaron Guzman Rojas;ACISA;E-Bike Masculino - 50
+Endurance;952;Aaron Guzman Rojas;ACISA;Bike Masculino - 50
 Endurance;36;Paolo Montoya Cantillo;COLONO BIKE STATION KOLBI ;Elite Masculino
 Endurance;711;Adriano Gonzalez Rodriguez;COLONO BIKE STATION KOLBI ;Sub 23 Masculino
 Endurance;841;Alexandra Chacon Garro;TREK;Master A Femenino
@@ -261,7 +260,7 @@ Endurance;812;Maria Natalia Rojas Meneses;ADN BIKES ;Elite Femenino
 Endurance;643;Gustavo Fabian Varela Varela;AMPM;Open Masculino
 Endurance;37;Kenneth Benavides Jimenez;BELEN TEAM ;Elite Masculino
 Endurance;644;Yeikol Alexandro Arias Carvajal;AD TRAINING ;Open Masculino
-Endurance;953;Luis Miguel Monge Porras;ATOMICA-BIKE TIME-IMPETSA;E-Bike Masculino - 50
+Endurance;953;Luis Miguel Monge Porras;ATOMICA-BIKE TIME-IMPETSA;Bike Masculino - 50
 Endurance;38;Federico Nonato Ramirez Flores;MEGAMO MANZATE LA SELVA;Elite Masculino
 Endurance;161;Roberto Torres Alvarez;BIKESTATION/SPECIALIZED;Master A Masculino
 Endurance;855;Marcela Soto Prats;TRI TRAINING;Master B Femenino
@@ -274,15 +273,15 @@ Reto;3159;Ligia Madrigal Moya-Federico Escalante Fonseca;SPECIALIZED- BIKESTATIO
 Reto;3106;Luis Zeledon Polanco-Jesus Enrique Santana Vargas;ACISA CCDR SARAPIQUI ;Duos Masculino
 Reto;2519;Carlos Luis Quesada Salvatierra;INDEPENDIENTE ;Expertos E Masculino
 Reto;2713;Alejandro Martinez Sanchez;TURRIALBA ;Juvenil Masculino
-Endurance;954;Albino Alejandro Vasquez Vasquez;TEAM BALANCE ;E-Bike Masculino - 50
-Endurance;990;Albino Vasquez Pacheco;TEAM BALANCE ;E-Bike Masculino +50
-Endurance;955;Alexander Padilla Cruz;INDEPENDIENTE;E-Bike Masculino - 50
-Endurance;991;Randall Mora Valverde;TALLER AVILA ;E-Bike Masculino +50
-Endurance;956;Jeffry Vargas Rodriguez;ELECTRIC BOYS;E-Bike Masculino - 50
+Endurance;954;Albino Alejandro Vasquez Vasquez;TEAM BALANCE ;Bike Masculino - 50
+Endurance;990;Albino Vasquez Pacheco;TEAM BALANCE ;Bike Masculino +50
+Endurance;955;Alexander Padilla Cruz;INDEPENDIENTE;Bike Masculino - 50
+Endurance;991;Randall Mora Valverde;TALLER AVILA ;Bike Masculino +50
+Endurance;956;Jeffry Vargas Rodriguez;ELECTRIC BOYS;Bike Masculino - 50
 Endurance;425;Luis Angel Rodriguez Saborio;JONATHAN.CYCLING / FISIO NORTE ;Master D Masculino
 Endurance;965;Adriana Arroyo Aguilar;INDEPENDIENTE ;Open E-Bike
 Endurance;162;Julian Rodriguez Vargas;BELEN TEAM ;Master A Masculino
-Endurance;957;Jorge Eduardo Solano Soto;INDEPENDIENTE ;E-Bike Masculino - 50
+Endurance;957;Jorge Eduardo Solano Soto;INDEPENDIENTE ;Bike Masculino - 50
 Endurance;163;Josue Zamora Villegas;N/A ;Master A Masculino
 Endurance;275;Carlos Villalta Caravaca;GOCHA CYCLING TEAM;Master B Masculino
 Endurance;276;Diego Mendez Sandoval;ULTIMATE ;Master B Masculino
@@ -294,10 +293,8 @@ Endurance;514;Jose Luis Fernandez Sosa;LUCART;Master E Masculino
 Endurance;866;Dilcen Loria Munoz;FISIONORTE / QUESADAJONATHAN.CYCLING;Master C Femenino
 Endurance;867;Lisbeth Alvarado Lopez;ROES CENTELA ;Master C Femenino
 Endurance;40;Cristian Yareth Molinares Monestel;OSOS BIKE SHOP- NUTRI SOURCE;Elite Masculino
-Endurance;958;Luis Arturo Polinaris Vives;TRIMAX ENDURANCE CLUB;E-Bike Masculino - 50
+Endurance;958;Luis Arturo Polinaris Vives;TRIMAX ENDURANCE CLUB;Bike Masculino - 50
 Endurance;3346;Francisco Mora Valverde;Cbz Dekra Maxxis;Gravel
-Endurance;3348;Jose Ricardo Aguiar Garita;Finca 2 Erres - Prime Marine - Ciclo Charly;Gravel
-Reto;2714;Santiago Vega Steller;INFINITY BIKE CENTER-CCDR DE NARANJO;Juvenil Masculino
 Reto;2978;Johanna Umana Aguilar;VEINTE24;Femenina B
 Endurance;164;Marco Solano Duran;ZANATE’S BIKE CLUB;Master A Masculino
 Endurance;41;Carlos Herrera Arroyo;PEDREGAL 7C;Elite Masculino
@@ -307,6 +304,8 @@ Endurance;843;Fressy Vargas Alvarez;VEINTE24 CYCLING;Master A Femenino
 Endurance;844;Yuliana Hernandez Picado;SAPPHIRE TABA CYCLING TEAM;Master A Femenino
 Endurance;814;Valeria Dayanna Badilla Solis;FISIOSANA - VEINTE24;Elite Femenino
 Endurance;1060;Eilyn Jiron Carmona-Patricio Hernandez Corea;VEINTE24 -SAPPHIRE TABA  CYCLING TEAM;Duos Mixto
-Endurance;165;Steven Chacon Chacon;ULTIMATE TEAM;Master A Masculino
+Endurance;165;Steven Chacon Godinez;ULTIMATE TEAM;Master A Masculino
 Endurance;42;Jack Dany Rivera Castro;VEINTE24CYCLING;Elite Masculino
 Reto;2936;Susana Maria Godinez Hernandez;DRASANVI ECOTIENDA BUFF MOBYBIKE;Femenina A
+Endurance;277;Erick Vives Quesada;BIKE VIVES - MOTOPARTS ALEJANDRO CHINCHILLA;Master B Masculino
+Endurance;43;Jose Ricardo Aguiar Garita;Finca 2 Erres - Prime Marine - Ciclo Charly;Elite Masculino
