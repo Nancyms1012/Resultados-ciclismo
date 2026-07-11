@@ -3,7 +3,7 @@
 (function() {
     'use strict';
 
-    const SITE_URL = 'https://nancyms1012.github.io/Resultados-ciclismo/inscritos.html';
+    const SITE_URL = 'https://raceclubhub.com/inscritos.html';
 
     const eventsGrid = document.getElementById('events-grid');
     const loadingState = document.getElementById('landing-loading');
