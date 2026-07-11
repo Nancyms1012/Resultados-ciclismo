@@ -18,8 +18,6 @@
 
     // DOM Elements
     const searchInput = document.getElementById('search-text');
-    const categorySelect = document.getElementById('filter-category');
-    const equipoSelect = document.getElementById('filter-equipo');
     const genderSelect = document.getElementById('filter-gender');
     const btnSearch = document.getElementById('btn-search');
     const btnClear = document.getElementById('btn-clear');
@@ -32,6 +30,10 @@
     const tableWrapper = document.querySelector('.table-wrapper');
     const eventTitleEl = document.getElementById('event-title');
     const eventSubtitle = document.getElementById('event-subtitle');
+
+    // Multi-select state
+    let selectedCategories = [];
+    let selectedEquipos = [];
 
     // Set page title
     document.title = eventoNombre + ' - Resultados';
@@ -54,9 +56,25 @@
             if (e.key === 'Enter') applyFilters();
         });
         searchInput.addEventListener('input', debounce(applyFilters, 300));
-        categorySelect.addEventListener('change', applyFilters);
-        equipoSelect.addEventListener('change', applyFilters);
         genderSelect.addEventListener('change', applyFilters);
+
+        // Multi-select dropdowns
+        setupMultiSelect('ms-category', function(selected) {
+            selectedCategories = selected;
+            applyFilters();
+        });
+        setupMultiSelect('ms-equipo', function(selected) {
+            selectedEquipos = selected;
+            applyFilters();
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.multi-select')) {
+                document.querySelectorAll('.multi-select-dropdown').forEach(d => d.classList.remove('show'));
+                document.querySelectorAll('.multi-select-header').forEach(h => h.classList.remove('active'));
+            }
+        });
 
         // View toggle buttons
         document.getElementById('btn-general').addEventListener('click', function() {
@@ -85,6 +103,48 @@
                 renderResults();
             });
         });
+    }
+
+    function setupMultiSelect(id, onChange) {
+        const container = document.getElementById(id);
+        const header = container.querySelector('.multi-select-header');
+        const dropdown = container.querySelector('.multi-select-dropdown');
+
+        header.addEventListener('click', function(e) {
+            e.stopPropagation();
+            // Close other dropdowns
+            document.querySelectorAll('.multi-select-dropdown').forEach(d => {
+                if (d !== dropdown) d.classList.remove('show');
+            });
+            document.querySelectorAll('.multi-select-header').forEach(h => {
+                if (h !== header) h.classList.remove('active');
+            });
+            dropdown.classList.toggle('show');
+            header.classList.toggle('active');
+        });
+
+        dropdown.addEventListener('change', function() {
+            const checked = Array.from(dropdown.querySelectorAll('input:checked')).map(cb => cb.value);
+            onChange(checked);
+            updateMultiSelectHeader(id, checked);
+        });
+    }
+
+    function updateMultiSelectHeader(id, selected) {
+        const header = document.querySelector('#' + id + ' .multi-select-header');
+        const isCategory = id === 'ms-category';
+        const defaultText = isCategory ? 'Todas las categorias' : 'Todos los equipos';
+
+        if (selected.length === 0) {
+            header.textContent = defaultText;
+            header.classList.remove('has-selection');
+        } else if (selected.length === 1) {
+            header.textContent = selected[0];
+            header.classList.add('has-selection');
+        } else {
+            header.textContent = selected.length + (isCategory ? ' categorias' : ' equipos');
+            header.classList.add('has-selection');
+        }
     }
 
     function loadData() {
@@ -338,24 +398,27 @@
 
     // ===== FILTERS =====
     function populateFilters() {
-        categorySelect.innerHTML = '<option value="">Todas las categorias</option>';
-        equipoSelect.innerHTML = '<option value="">Todos los equipos</option>';
-        categories.forEach(cat => {
-            const opt = document.createElement('option');
-            opt.value = cat; opt.textContent = cat;
-            categorySelect.appendChild(opt);
-        });
-        equipos.forEach(eq => {
-            const opt = document.createElement('option');
-            opt.value = eq; opt.textContent = eq;
-            equipoSelect.appendChild(opt);
-        });
+        // Populate category multi-select
+        const catDropdown = document.getElementById('ms-category-dropdown');
+        catDropdown.innerHTML = categories.map(cat => `
+            <div class="multi-select-item">
+                <input type="checkbox" id="cat-${cat}" value="${cat}">
+                <label for="cat-${cat}">${cat}</label>
+            </div>
+        `).join('');
+
+        // Populate equipo multi-select
+        const eqDropdown = document.getElementById('ms-equipo-dropdown');
+        eqDropdown.innerHTML = equipos.map(eq => `
+            <div class="multi-select-item">
+                <input type="checkbox" id="eq-${eq}" value="${eq}">
+                <label for="eq-${eq}">${eq}</label>
+            </div>
+        `).join('');
     }
 
     function applyFilters() {
         const searchTerm = searchInput.value.trim().toLowerCase();
-        const selectedCat = categorySelect.value;
-        const selectedEquipo = equipoSelect.value;
         const selectedGender = genderSelect.value;
         const isNumericSearch = /^\d+$/.test(searchTerm);
 
@@ -368,8 +431,8 @@
                     matchSearch = r.nombre.toLowerCase().includes(searchTerm);
                 }
             }
-            const matchCat = !selectedCat || r.categoria === selectedCat;
-            const matchEquipo = !selectedEquipo || r.equipo === selectedEquipo;
+            const matchCat = selectedCategories.length === 0 || selectedCategories.includes(r.categoria);
+            const matchEquipo = selectedEquipos.length === 0 || selectedEquipos.includes(r.equipo);
             const matchGender = !selectedGender || r.genero === selectedGender;
             return matchSearch && matchCat && matchEquipo && matchGender;
         });
@@ -378,9 +441,13 @@
 
     function clearFilters() {
         searchInput.value = '';
-        categorySelect.value = '';
-        equipoSelect.value = '';
         genderSelect.value = '';
+        selectedCategories = [];
+        selectedEquipos = [];
+        // Uncheck all checkboxes
+        document.querySelectorAll('.multi-select-dropdown input').forEach(cb => cb.checked = false);
+        updateMultiSelectHeader('ms-category', []);
+        updateMultiSelectHeader('ms-equipo', []);
         filteredResults = [...allResults];
         renderResults();
     }
