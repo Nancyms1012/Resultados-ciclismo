@@ -79,9 +79,31 @@
         showLoading(true);
         const cacheBuster = '?t=' + Date.now();
 
-        fetch('data/inscritos.csv' + cacheBuster)
+        // Try multiple possible filenames
+        const possibleFiles = [
+            'data/INSCRITOS_TURRI.csv',
+            'data/inscritos.csv',
+            'data/Inscritos.csv',
+            'data/INSCRITOS.csv'
+        ];
+
+        tryLoadFiles(possibleFiles, cacheBuster);
+    }
+
+    function tryLoadFiles(files, cacheBuster) {
+        if (files.length === 0) {
+            showLoading(false);
+            allInscritos = [];
+            filteredInscritos = [];
+            eventSubtitle.textContent = 'Sube tu archivo de inscritos a la carpeta data/';
+            renderResults();
+            return;
+        }
+
+        const file = files[0];
+        fetch(file + cacheBuster)
             .then(response => {
-                if (!response.ok) throw new Error('No file');
+                if (!response.ok) throw new Error('Not found');
                 return response.text();
             })
             .then(text => {
@@ -94,13 +116,8 @@
                 showLoading(false);
                 eventSubtitle.textContent = allInscritos.length + ' inscritos';
             })
-            .catch(error => {
-                console.log('Info:', error.message);
-                showLoading(false);
-                allInscritos = [];
-                filteredInscritos = [];
-                eventSubtitle.textContent = 'Sube inscritos.csv a la carpeta data/';
-                renderResults();
+            .catch(() => {
+                tryLoadFiles(files.slice(1), cacheBuster);
             });
     }
 
