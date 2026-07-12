@@ -8,13 +8,7 @@
     const eventsGrid = document.getElementById('events-grid');
     const loadingState = document.getElementById('landing-loading');
     const emptyState = document.getElementById('landing-empty');
-    const landingDate = document.getElementById('landing-date');
     const qrContainer = document.getElementById('qr-code');
-
-    // Show today's date
-    const today = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    landingDate.textContent = today.toLocaleDateString('es-ES', options);
 
     // Generate QR code
     document.addEventListener('DOMContentLoaded', function() {
