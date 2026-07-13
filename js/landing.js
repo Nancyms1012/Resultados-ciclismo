@@ -71,9 +71,10 @@
             const nombre = evt.evento || evt.nombre || 'Evento';
             const descripcion = evt.descripcion || '';
             const archivo = evt.archivo || '';
+            const fecha = evt.fecha || '';
 
             return `
-                <a href="resultados.html?evento=${encodeURIComponent(archivo)}&nombre=${encodeURIComponent(nombre)}" class="event-card">
+                <a href="resultados.html?evento=${encodeURIComponent(archivo)}&nombre=${encodeURIComponent(nombre)}&fecha=${encodeURIComponent(fecha)}" class="event-card">
                     <div class="event-card-logo">
                         ${logoSrc 
                             ? `<img src="${logoSrc}" alt="${nombre}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">

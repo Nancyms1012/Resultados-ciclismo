@@ -7,6 +7,7 @@
     const params = new URLSearchParams(window.location.search);
     const eventoArchivo = params.get('evento') || '';
     const eventoNombre = params.get('nombre') || 'Resultados';
+    const eventoFecha = params.get('fecha') || '';
 
     // State
     let allResults = [];
@@ -38,6 +39,9 @@
     // Set page title
     document.title = eventoNombre + ' - Resultados';
     eventTitleEl.textContent = eventoNombre;
+    if (eventoFecha) {
+        eventSubtitle.textContent = eventoFecha;
+    }
 
     // Initialize
     document.addEventListener('DOMContentLoaded', init);
@@ -226,14 +230,17 @@
                 const nombre = getColValue(parts, colMap.nombre);
                 const equipo = getColValue(parts, colMap.equipo);
                 const tiempo = getColValue(parts, colMap.tiempo);
+                const categoriaCol = getColValue(parts, colMap.categoria);
+                // Use category from column if available, otherwise from section header
+                const categoria = categoriaCol || currentCategory;
 
-                if (pos && !isNaN(parseInt(pos)) && nombre.trim()) {
+                if (numero && nombre.trim()) {
                     results.push({
-                        posicion: parseInt(pos),
+                        posicion: parseInt(pos) || results.length + 1,
                         dorsal: parseInt(numero) || 0,
                         nombre: nombre.trim(),
-                        categoria: currentCategory,
-                        genero: detectGender(currentCategory),
+                        categoria: categoria,
+                        genero: detectGender(categoria),
                         equipo: equipo ? equipo.trim() : '',
                         tiempo: formatTime(tiempo),
                         diferencia: ''
@@ -243,8 +250,8 @@
                         posicion: 999,
                         dorsal: parseInt(numero) || 0,
                         nombre: nombre.trim(),
-                        categoria: currentCategory,
-                        genero: detectGender(currentCategory),
+                        categoria: categoria,
+                        genero: detectGender(categoria),
                         equipo: equipo ? equipo.trim() : '',
                         tiempo: pos.trim().toUpperCase(),
                         diferencia: ''
@@ -286,18 +293,19 @@
     function isColumnHeader(parts) {
         if (parts.length < 3) return false;
         const first = parts[0].trim().toLowerCase();
-        return ['pos', 'posicion', 'position', '#', 'lugar', 'place'].includes(first);
+        return ['pos', 'posicion', 'position', '#', 'lugar', 'place', 'placa', 'dorsal', 'numero'].includes(first);
     }
 
     function mapColumns(parts) {
-        const map = { pos: 0, numero: 1, nombre: 2, equipo: -1, tiempo: -1 };
+        const map = { pos: -1, numero: -1, nombre: -1, equipo: -1, tiempo: -1, categoria: -1 };
         for (let i = 0; i < parts.length; i++) {
             const col = parts[i].trim().toLowerCase();
             if (['pos','posicion','position','#','lugar'].includes(col)) map.pos = i;
-            else if (['numero','num','dorsal','bib','no','number'].includes(col)) map.numero = i;
+            else if (['numero','num','dorsal','bib','no','number','placa'].includes(col)) map.numero = i;
             else if (col.includes('nombre') || col.includes('name') || col.includes('participante')) map.nombre = i;
             else if (['equipo','team','club','grupo'].includes(col)) map.equipo = i;
             else if (['tiempo','time','hora','crono','finish','chip'].includes(col)) map.tiempo = i;
+            else if (['categoria','cat','category','grupo'].includes(col)) map.categoria = i;
         }
         return map;
     }
